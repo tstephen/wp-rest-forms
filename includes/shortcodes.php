@@ -43,7 +43,7 @@
     $form_content = apply_filters('the_content', $form_content);
     $form_content = str_replace(']]>', ']]&gt;', $form_content);
 
-    $temp_content .= '<form class="" id="'.$form->post_name.'">';
+    $temp_content .= '<form class="p-form" id="'.$form->post_name.'">';
     $temp_content .= '<div class="p-messages"></div>';
 
     $temp_content .= $form_content;
