@@ -4,13 +4,13 @@
  * Plugin URI: http://knowprocess.com/wp-plugins/syncapt
  * Description: Integrates web APIs with your WordPress app.
  * Author: Tim Stephenson
- * Version: 0.9.2
+ * Version: 0.9.3
  * Author URI: http://syncapt.com
  * License: GPLv2 or later
  */
 
   define("P_ID", 'wp-workflow');
-  define('P_VERSION', '0.9.2');
+  define('P_VERSION', '0.9.3');
   define("P_NAME", 'Syncapt');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 

@@ -43,6 +43,9 @@ error_log('msg ns: '.$msg_namespace);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+      'Origin: '.get_site_url()
+    ));
 
     $response = curl_exec($ch);
     if (P_DEBUG) error_log('XXXXXXXXXXXXXXXResponse: '.$response);
