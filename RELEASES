@@ -1,3 +1,7 @@
+0.9.4
+-----
+Parse Google AdWords params and merge into message submitted from form.
+
 0.9.3
 -----
 Set Origin header on event publication
@@ -10,7 +14,7 @@ Set Origin header on event publication
 0.9.1
 -----
 - Enable optional redirect on successful sendMessage
-- Allow override of the message name sent to Syncapt server on form submit
+- Allow override of the message name sent to server on form submit
 - Check validity of form before submit
 - Fix CSS loading
 - Fix to forms handling

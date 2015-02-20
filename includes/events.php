@@ -1,12 +1,7 @@
 <?php
 
-  // TODO need to have seetings page for this
-  //define("P_MSG_NAMESPACE", P_ID.'-message-namespace');
-  //define("P_MSG_NAMESPACE", $syncapt_options->get_message_namespace());
-//  define("P_API_URL", 'http://api.knowprocess.com/msg/');
-  if ($syncapt_options == null) $syncapt_options = new SyncaptOptions();
-  define("P_API_URL", $syncapt_options->get_api_url());
-
+  if ($p_options == null) $p_options = new FormsOptions();
+  define("P_API_URL", $p_options->get_api_url());
 
   function p_post_published_notification( $ID, $post ) {
     if (P_DEBUG) error_log('Call to p_post_published_notification');
@@ -23,13 +18,12 @@
     $headers[] = '';
     //wp_mail( $to, $subject, $message, $headers );
 
-    if ($syncapt_options == null) $syncapt_options = new SyncaptOptions();
-    $msg_namespace = $syncapt_options->get_message_namespace();
-error_log('msg ns: '.$msg_namespace);
+    if ($p_options == null) $p_options = new FormsOptions();
+    $msg_namespace = $p_options->get_message_namespace();
     $msg_name = ''.$msg_namespace.'.postPublicationEvent.json';
     $json = '{"title":"'.$title.'","permalink":"'.$permalink.'"}';
     if (P_DEBUG) {
-      error_log('Notifying Syncapt: ');
+      error_log('Notifying server: ');
       error_log('  Message name: '.$msg_name);
       error_log('  JSON: '.$json);
     }
@@ -48,7 +42,7 @@ error_log('msg ns: '.$msg_namespace);
     ));
 
     $response = curl_exec($ch);
-    if (P_DEBUG) error_log('XXXXXXXXXXXXXXXResponse: '.$response);
+    if (P_DEBUG) error_log('Response: '.$response);
     $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     if (P_DEBUG || $http_status >=300) error_log('Response from '.$url.': '.$http_status);
     curl_close($ch);

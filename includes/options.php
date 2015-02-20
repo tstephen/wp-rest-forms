@@ -1,6 +1,6 @@
 <?php
-define('P_API_URL', 'https://api.knowprocess.com/msg/');
-class SyncaptOptions {
+define('P_API_URL', 'https://api.knowprocess.com');
+class FormsOptions {
 
     /**
      * Holds the values to be used in the fields callbacks
@@ -15,7 +15,7 @@ class SyncaptOptions {
         add_action( 'admin_init', array( $this, 'p_page_init' ) );
 
         // Set class property
-        $this->options = get_option( 'syncapt_options' );
+        $this->options = get_option( P_ID.'_options' );
     }
 
     public function is_debug_on() {
@@ -40,7 +40,7 @@ class SyncaptOptions {
     public function p_add_plugin_page() {
         // This page will be under "Settings"
         add_options_page(
-            P_NAME.'Settings Admin',
+            P_NAME.' Settings Admin',
             P_NAME.' Settings',
             'manage_options',
             'p_settings_admin',
@@ -60,7 +60,7 @@ class SyncaptOptions {
             <form method="post" action="options.php">
             <?php
                 // This prints out all hidden setting fields
-                settings_fields( 'syncapt_option_group' );
+                settings_fields( P_ID.'_option_group' );
                 do_settings_sections( 'p_settings_admin' );
                 submit_button();
             ?>
@@ -74,8 +74,8 @@ class SyncaptOptions {
      */
     public function p_page_init() {
         register_setting(
-            'syncapt_option_group', // Option group
-            'syncapt_options', // Option name
+            P_ID.'_option_group', // Option group
+            P_ID.'_options', // Option name
             array( $this, 'sanitize' ) // Sanitize
         );
 
@@ -160,7 +160,7 @@ class SyncaptOptions {
      */
     public function p_debug_callback() {
         printf(
-            '<input type="checkbox" id="debug" name="syncapt_options[debug]" %s />',
+            '<input type="checkbox" id="debug" name="'.P_ID.'_options[debug]" %s />',
             isset( $this->options['debug'] ) && $this->options['debug'] == True ? 'checked' : ''
         );
     }
@@ -170,7 +170,7 @@ class SyncaptOptions {
      */
     public function p_message_namespace_callback() {
         printf(
-            '<input type="text" id="message_namespace" name="syncapt_options[message_namespace]" value="%s" />',
+            '<input type="text" id="message_namespace" name="'.P_ID.'_options[message_namespace]" value="%s" />',
             isset( $this->options['message_namespace'] ) ? esc_attr( $this->options['message_namespace']) : ''
         );
     }
@@ -180,7 +180,7 @@ class SyncaptOptions {
      */
     public function p_api_url_callback() {
         printf(
-            '<input type="text" id="api_url" name="syncapt_options[api_url]" value="%s" />',
+            '<input type="text" id="api_url" name="'.P_ID.'_options[api_url]" value="%s" />',
             isset( $this->options['api_url'] ) ? esc_attr( $this->options['api_url']) : P_API_URL
         );
     }
@@ -191,7 +191,7 @@ class SyncaptOptions {
     public function p_post_published_callback() {
         //error_log('Write option named: '.$this->options['post_published']);
         printf(
-            '<input type="checkbox" id="post_published" name="syncapt_options[post_published]" %s />',
+            '<input type="checkbox" id="post_published" name="'.P_ID.'_options[post_published]" %s />',
             isset( $this->options['post_published'] ) && $this->options['post_published'] == True ? 'checked' : ''
         );
     }
