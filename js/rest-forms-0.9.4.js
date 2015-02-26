@@ -78,13 +78,20 @@ function App() {
     var obj = $('#title').val().toLowerCase().replace(/ /g, '_');
     var required = $('#ctrlRequired').prop('checked');
     switch ($('#ctrlType').val()) {
+      case 'select':
+        ctrl = '<select class="decorate" id="'+$('#ctrlId').val()
+        +'" name="'+$('#ctrlLabel').val()
+        +'" '+(required?'required ':'')+'>'
+        +'\n  <option value=""></option>'
+        +'\n</select>\n';
+        break;
       case 'textarea':
-        ctrl = '<textarea class="decorate" data-p-bind="$p.'+obj+'.'+$('#ctrlBinding').val()
+        ctrl = '<textarea class="decorate" id="'+$('#ctrlId').val()
         +'" name="'+$('#ctrlLabel').val()
         +'" '+(required?'required ':'')+'rows="3" placeholder="'+$('#ctrlPlaceholder').val()+'"></textarea>\n';
         break;
         default:
-          ctrl = '<input class="decorate" data-p-bind="$p.'+obj+'.'+$('#ctrlBinding').val()
+          ctrl = '<input class="decorate" id="'+$('#ctrlId').val()
           +'" name="'+$('#ctrlLabel').val()+'" '+(required?'required ':'')+'title="'
           +$('#ctrlPlaceholder').val()+'" type="'+$('#ctrlType').val()+'"/>\n';
           break;
@@ -174,6 +181,8 @@ function App() {
         });
       };
       this.bindControls = function() {
+        $('.p-form input[id]:not([data-p-bind]), .p-form select[id]:not([data-p-bind]), .p-form textarea[id]:not([data-p-bind])')
+          .attr('data-p-bind',function() { return '$p.'+$(this).closest('form')[0].id.replace(/-/g,'_')+'.'+this.id; });
         $('[data-p-bind]:not([placeholder])')
         .attr('placeholder', function() { return this.title; });
         $('[data-p-bind].decorate')
@@ -370,6 +379,23 @@ this.getResource = function(resource, searchExpr, callback) {
     });
   }
 };
+this.handleCallback = function(msg, wp_callback) {
+  console.log('handleCallback: '+msg+', '+wp_callback);
+  if ($params != undefined) jQuery.extend(msg, $params);
+  if (wp_callback == undefined || wp_callback == '') { 
+    console.warn('No callback to execute');
+  } else {
+    var data = {
+	  	'action': wp_callback,
+		  'json': (msg!=undefined && typeof msg == 'object') 
+         ? encodeURIComponent(JSON.stringify(msg))
+         : msg
+	  };
+	  $.post('/wp-admin/admin-ajax.php', data, function(response) {
+		  console.log('Got this from the server: ' + response);
+	  });
+  }
+};
 this.hideActivityIndicator = function(msg, addClass) {
   if (msg === undefined) msg = '';
   $('.p-messages').empty().append(msg).removeClass('blink');
@@ -385,12 +411,20 @@ this.isOffline = function() {
 /**
 * @param msg JSON or object repesentation of message to send
 */
-this.sendMessage = function(mep, msgName, msg, redirect) {
+this.sendMessage = function(mep, msgName, msg, redirect, wp_callback) {
+  console.log('sendMessage');
+	$p.handleCallback(msg, wp_callback); 
+  $p.handleCallback(msg, 'p_send_mail'); 
+
+  if (mep=='none') { 
+    console.log('Server integration turned off');
+    if (undefined != redirect) window.location.href=redirect;
+  } else {
   jQuery('html, body').css("cursor", "wait");
   console.log('Sending '+msgName+' as mep: '+mep);
   var type = ((mep == 'inOut' || mep == 'outOnly') ? 'GET' : 'POST');
+  msg.tenantId = $p.tenant;
   // TODO 
-  msg.tenantId = 'firmgains';
   if (msg.accountInfo != undefined) msg.accountInfo.tenantId = 'firmgains';
   if (msg.account != undefined) msg.account.tenantId = 'firmgains';  
   console.log('msg: '+ msg);
@@ -411,6 +445,8 @@ this.sendMessage = function(mep, msgName, msg, redirect) {
     data: d,
     dataType: 'text',
     timeout: 30000,
+    username: $p.k,
+    password: $p.v,
     success: function(response, textStatus, jqxhr) {
       console.log('successfully start instance by msg: '+jqxhr.getResponseHeader('Location'));
       console.log('  headers: '+JSON.stringify(jqxhr.getAllResponseHeaders()));
@@ -434,6 +470,7 @@ this.sendMessage = function(mep, msgName, msg, redirect) {
         jQuery('html, body').css("cursor", "auto");
       }
     });
+   }
   };
   this.showActivityIndicator = function(msg, addClass) {
     document.body.style.cursor='progress';

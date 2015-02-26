@@ -29,12 +29,14 @@
       <arg value="js/${ant.project.name}-${version}.js"/>
     </exec>
 
+    <!--
     <copy file="js/workflow-${build.lastReleased}.js" 
           tofile="js/workflow-${version}.js"/>
     <exec executable="git">
       <arg value="add"/>
       <arg value="js/workflow-${version}.js"/>
     </exec>
+    -->
 
     <copy file="css/admin-${build.lastReleased}.css" 
           tofile="css/admin-${version}.css"/>
@@ -83,17 +85,16 @@
           <pathelement location="${yuicompressor-local-path}"/>
         </classpath>
     </java>
+    <!--
     <java jar="${yuicompressor-local-path}" fork="true">
-        <!-- input path for JS files -->
         <arg value="${src}/js/workflow-${version}.js" />
-        <!--<arg value="-v" /> --><!-- Turn on verbose -->
         <arg value="-o" />
-        <!-- output path for JS files -->
         <arg value="${src}/js/workflow-${version}.min.js" /> 
         <classpath>
           <pathelement location="${yuicompressor-local-path}"/>
         </classpath>
     </java>
+    -->
   </target>
 
   <target name="package" depends="compile">

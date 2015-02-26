@@ -30,8 +30,6 @@
     // front end only 
   }
   add_action( 'wp_enqueue_scripts', 'p_load_scripts' );
-  add_action( 'init', 'p_create_capabilities' );
-  //add_action( 'init', 'p_create_mail_page' );
   add_action( 'wp_head', 'p_load_styles' );
 
   function p_footer() {
@@ -41,6 +39,8 @@
       <script type="text/javascript">jQuery(document).ready(function(){
         $p.server='<?php echo $p_options->get_api_url(); ?>';
         $p.tenant='<?php echo $p_options->get_message_namespace(); ?>';
+        $p.k='<?php echo $p_options->get_api_key(); ?>';
+        $p.v='<?php echo $p_options->get_api_secret(); ?>';
       });</script>
     <?php 
   }

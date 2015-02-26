@@ -22,6 +22,10 @@ class FormsOptions {
       return isset( $this->options['debug'] ) && $this->options['debug'] == True;
     }
 
+    public function get_mail_addressee() {
+      return $this->options['mail_addressee'];
+    }
+
     public function get_message_namespace() {
       return $this->options['message_namespace'];
     }
@@ -34,6 +38,13 @@ class FormsOptions {
       }
     }
 
+    public function get_api_key() {
+      return isset( $this->options['api_key'] ) ? $this->options['api_key'] : '';
+    }
+
+    public function get_api_secret() {
+      return isset( $this->options['api_secret'] ) ? $this->options['api_secret'] : '';
+    }
     /**
      * Add options page
      */
@@ -87,19 +98,43 @@ class FormsOptions {
         );
 
         add_settings_field(
-            'debug', // ID
-            'Enable debug output', // Label
-            array( $this, 'p_debug_callback' ), // Callback
-            'p_settings_admin', // Page
-            'p_setting_section_general' // Section
-        );
-
-        add_settings_field(
             'api_url', // ID
             'API Server URL', // Label
             array( $this, 'p_api_url_callback' ), // Callback
             'p_settings_admin',
             'p_setting_section_general'
+        );
+
+        add_settings_field(
+            'api_key', // ID
+            'API Key', // Label
+            array( $this, 'p_api_key_callback' ), // Callback
+            'p_settings_admin',
+            'p_setting_section_general'
+        );
+
+        add_settings_field(
+            'api_secret', // ID
+            'API Secret', // Label
+            array( $this, 'p_api_secret_callback' ), // Callback
+            'p_settings_admin',
+            'p_setting_section_general'
+        );
+
+        add_settings_field(
+            'mail_addressee', // ID
+            'Mail Addressee', // Label
+            array( $this, 'p_mail_addressee_callback' ), // Callback
+            'p_settings_admin',
+            'p_setting_section_general'
+        );
+
+        add_settings_field(
+            'debug', // ID
+            'Enable debug output', // Label
+            array( $this, 'p_debug_callback' ), // Callback
+            'p_settings_admin', // Page
+            'p_setting_section_general' // Section
         );
 
         add_settings_field(
@@ -135,6 +170,14 @@ class FormsOptions {
         $new_input = array();
         if( isset( $input['api_url'] ) )
             $new_input['api_url'] = sanitize_text_field( $input['api_url'] );
+        if( isset( $input['api_key'] ) )
+            $new_input['api_key'] = sanitize_text_field( $input['api_key'] );
+        if( isset( $input['api_secret'] ) )
+            $new_input['api_secret'] = sanitize_text_field( $input['api_secret'] );
+
+error_log('XXXXXX'. $input['mail_addressee']);
+        if( isset( $input['mail_addressee'] ) )
+            $new_input['mail_addressee'] = sanitize_text_field( $input['mail_addressee'] );
 
         if( isset( $input['debug'] ) )
             $new_input['debug'] = true ;
@@ -166,6 +209,16 @@ class FormsOptions {
     }
 
     /**
+     * Output textbox for 'mail_addressee' option.
+     */
+    public function p_mail_addressee_callback() {
+        printf(
+            '<input type="text" id="mail_addressee" name="'.P_ID.'_options[mail_addressee]" value="%s" />',
+            isset( $this->options['mail_addressee'] ) ? esc_attr( $this->options['mail_addressee']) : ''
+        );
+    }
+
+    /**
      * Output textbox for 'message_namespace' option.
      */
     public function p_message_namespace_callback() {
@@ -185,6 +238,28 @@ class FormsOptions {
         );
     }
 
+
+    /**
+     * Output textbox for 'api_url' option.
+     */
+    public function p_api_key_callback() {
+        printf(
+            '<input type="text" id="api_key" name="'.P_ID.'_options[api_key]" value="%s" />',
+            isset( $this->options['api_key'] ) ? esc_attr( $this->options['api_key']) : ''
+        );
+    }
+    
+
+    /**
+     * Output textbox for 'api_secret' option.
+     */
+    public function p_api_secret_callback() {
+        printf(
+            '<input type="text" id="api_secret" name="'.P_ID.'_options[api_secret]" value="%s" />',
+            isset( $this->options['api_secret'] ) ? esc_attr( $this->options['api_secret']) : ''
+        );
+    }
+    
     /**
      * Output checkbox for 'post_published' option.
      */

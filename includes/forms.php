@@ -44,15 +44,17 @@
   add_action( 'init', 'p_form_init', 0 );
 
   /**
-   * Adds a meta box to the form editing screen
+   * Adds meta boxes to the form editing screen
    */
   function p_custom_meta() {
     add_meta_box( 'p_meta', __( 'Generate form control', P_TEXT_DOMAIN ), 'p_meta_callback', 'p_form', 'side', 'high');
+    add_meta_box( 'p_meta_help', __( 'Help on form controls', P_TEXT_DOMAIN ), 'p_meta_help_callback', 'p_form', 'normal', 'high');
+    //remove_meta_box( 'postcustom' , 'p_form' , 'normal' ); 
   }
   add_action( 'add_meta_boxes', 'p_custom_meta' );
 
   /**
-   * Outputs the content of the meta box
+   * Outputs the meta box containing tools for creating form controls.
    */
   function p_meta_callback( $post ) {
     wp_nonce_field( basename( __FILE__ ), 'p_nonce' );
@@ -66,6 +68,7 @@
         <option value="email"><?php _e( 'Email', P_TEXT_DOMAIN )?></option>';
         <option value="tel"><?php _e( 'Telephone', P_TEXT_DOMAIN )?></option>';
         <option value="number"><?php _e( 'Number', P_TEXT_DOMAIN )?></option>';
+        <option value="select"><?php _e( 'Select', P_TEXT_DOMAIN )?></option>';
         <option value="text" selected><?php _e( 'Text', P_TEXT_DOMAIN )?></option>';
         <option value="textarea"><?php _e( 'Textarea', P_TEXT_DOMAIN )?></option>';
       </select>
@@ -77,8 +80,8 @@
     </p>
 
     <p>
-      <label for="ctrlBinding"><?php _e( 'Binding', P_TEXT_DOMAIN )?></label><br/>
-      <input type="text" name="ctrlBinding" id="ctrlBinding" value="<?php if ( isset ( $p_stored_meta['ctrlBinding'] ) ) echo $p_stored_meta['ctrlBinding'][0]; ?>" />
+      <label for="ctrlId"><?php _e( 'Id', P_TEXT_DOMAIN )?></label><br/>
+      <input type="text" name="ctrlId" id="ctrlId" value="<?php if ( isset ( $p_stored_meta['ctrlId'] ) ) echo $p_stored_meta['ctrlId'][0]; ?>" />
     </p>
 
     <p>
@@ -106,4 +109,26 @@
     <?php
   }
 
+  /**
+   * Outputs the meta box containing tools for creating form controls.
+   */
+  function p_meta_help_callback( $post ) {
+error_log('Called help renderer');
+    wp_nonce_field( basename( __FILE__ ), 'p_nonce' );
+    // TODO not sure why this is not being called on init, but it is not
+    p_load_scripts();
+    ?>
+    <p>
+      Form controls can take advantage of any HTML features, so for example to make something a required field simply use the required attribute on any form control. Similarly, standard html layout tags such as &lt;ul> and &lt;span> may be used. 
+    </p>
+    <p>
+      To provide a rich user interface including labels, hint text and validation with the minimum form definition <i><?php echo P_NAME ?></i> enhances the form at runtime based on the following rules, <b><em>if</em> the control has the 'decorate' CSS class:</b>
+      <ul style="list-style-type:circle;margin-left:30px;">
+        <li>Every form field is wrapped in a &lt;div> to keep label, field and hint together</li>
+        <li><b>name attribute: </b>Provides the text for the field's label.</li>
+        <li><b>title attribute: </b>Provides the hint text displayed, by default, on error.</li>
+        <li><b>id attribute: </b>Is used as the JavaScript variable binding. So a field with id 'fName' in a form whose slug is 'contact' can be accessed in JavaScript at <code>$p.contact.fName</code>.</li>
+      </ul>
+    <?php
+  }
 ?>
