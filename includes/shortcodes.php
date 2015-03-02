@@ -30,14 +30,14 @@
     foreach ($_REQUEST as $k => $v) {
       $temp_content .= $k.':"'.$v.'",';
     }
-    if (!is_null( $content )) { 
+    if (!empty( $content )) {
       $form_consts = explode(',', $content);
-      foreach($form_consts as $c) { 
+      foreach($form_consts as $c) {
         $arr = explode('=',$c);
         //$temp_content .= ('<input id="'.$arr[0].'" value="'.$arr[1].'" type="hidden"/>');
         $temp_content .= $arr[0].':"'.$arr[1].'",';
       }
-    } 
+    }
     $temp_content .= 'admin_email:"'.get_option( 'admin_email' ).'"};</script>';
 
     $temp_content .= '<button data-p-action="if (document.getElementById(\''.$form->post_name.'\').checkValidity()) $p.sendMessage(\''.$a['msg_pattern'].'\', \''.$options->get_message_namespace().'.'.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).',\''.$a['redirect_to'].'\',\''.$a['callback'].'\'); else $p.showFormError(\''.$form->post_name.'\',\'Please correct form errors\');" form="'.$form->post_name.'" type="button">Submit</button>';

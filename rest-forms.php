@@ -4,13 +4,13 @@
  * Plugin URI: http://knowprocess.com/wp-plugins/rest-forms
  * Description: Integrates web APIs with your WordPress app.
  * Author: Tim Stephenson
- * Version: 0.9.4
+ * Version: 0.9.5
  * Author URI: http://omny.link
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '0.9.4');
+  define('P_VERSION', '0.9.5');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
@@ -27,7 +27,7 @@
   if ( is_admin() ) {
     // admin only actions
   } else {
-    // front end only 
+    // front end only
   }
   add_action( 'wp_enqueue_scripts', 'p_load_scripts' );
   add_action( 'wp_head', 'p_load_styles' );
@@ -35,14 +35,17 @@
   function p_footer() {
     if (P_DEBUG) echo 'Running '.P_NAME.' plugin in debug mode!';
     if ($p_options == null) $p_options = new FormsOptions();
+    if ($p_options->is_fully_configured()) {
     ?>
       <script type="text/javascript">jQuery(document).ready(function(){
         $p.server='<?php echo $p_options->get_api_url(); ?>';
         $p.tenant='<?php echo $p_options->get_message_namespace(); ?>';
         $p.k='<?php echo $p_options->get_api_key(); ?>';
         $p.v='<?php echo $p_options->get_api_secret(); ?>';
+        $.ajaxSetup({xhrFields: {withCredentials: true}});
       });</script>
-    <?php 
+    <?php
+    }
   }
   add_action( 'wp_footer', 'p_footer' );
 

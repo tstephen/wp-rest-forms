@@ -1,3 +1,8 @@
+0.9.5
+-----
+Fix bug introduced by 0.9.4 when p_form shortcode is empty.
+Enable autthenticated CORS to Omny server.
+
 0.9.4
 -----
 Parse Google AdWords params and merge into message submitted from form.

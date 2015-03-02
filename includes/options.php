@@ -22,6 +22,18 @@ class FormsOptions {
       return isset( $this->options['debug'] ) && $this->options['debug'] == True;
     }
 
+    public function is_fully_configured() {
+      if (!empty($this->options['api_url'])
+              && !empty($this->options['message_namespace'])
+              && !empty($this->options['api_key'])
+              && !empty($this->options['api_secret'])) {
+          return True;
+      } else {
+          if (P_DEBUG) error_log(P_NAME.' not fully configured, please visit settings');
+          return False;
+      }
+    }
+
     public function get_mail_addressee() {
       return $this->options['mail_addressee'];
     }
@@ -175,7 +187,6 @@ class FormsOptions {
         if( isset( $input['api_secret'] ) )
             $new_input['api_secret'] = sanitize_text_field( $input['api_secret'] );
 
-error_log('XXXXXX'. $input['mail_addressee']);
         if( isset( $input['mail_addressee'] ) )
             $new_input['mail_addressee'] = sanitize_text_field( $input['mail_addressee'] );
 
@@ -248,7 +259,7 @@ error_log('XXXXXX'. $input['mail_addressee']);
             isset( $this->options['api_key'] ) ? esc_attr( $this->options['api_key']) : ''
         );
     }
-    
+
 
     /**
      * Output textbox for 'api_secret' option.
@@ -259,7 +270,7 @@ error_log('XXXXXX'. $input['mail_addressee']);
             isset( $this->options['api_secret'] ) ? esc_attr( $this->options['api_secret']) : ''
         );
     }
-    
+
     /**
      * Output checkbox for 'post_published' option.
      */

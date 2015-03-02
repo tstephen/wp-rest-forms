@@ -55,22 +55,26 @@
 
     $options = get_option( P_ID.'_options' );
     $to = $options['mail_addressee'];
-    if (P_DEBUG) error_log('Sending mail to: '.$to);
-    $subject = 'Trial request';
-    $json = urldecode($_POST['json']);
-    if (P_DEBUG) error_log('JSON received'.$json);
-    $a = json_decode($json, true);
-    //if (P_DEBUG) error_log('parsed: '.$a);
-    $message = '<div align="center"><table style="width:6.25in" border="0" cellpadding="0" cellspacing="0" width="600"><tbody>';
-    $message .= '<tr><td colspan="3" style="border:none;border-bottom:solid #d4d4d4 1.0pt;padding:7.5pt 7.5pt 7.5pt 7.5pt"><p  style="text-align:center" align="center"><strong><i><span style="font-size:15.0pt;font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;color:#4696d1">'.$a['pn'].'Trial Request</span></i></strong><i><span style="font-size:15.0pt;font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;color:#4696d1"><u></u><u></u></span></i></p></td></tr><tr style="height:3.75pt"><td colspan="3" style="background:#e2ecf1;padding:7.5pt 7.5pt 7.5pt 7.5pt;height:3.75pt"></td></tr>';
-    foreach ($a as $key => $value) { 
-      $message .= '<tr><td style="border-top:none;border-left:none;border-bottom:solid #d4d4d4 1.0pt;border-right:solid #d4d4d4 1.0pt;padding:7.5pt 7.5pt 7.5pt 7.5pt"><div ><strong><span style="font-size:9pt;font-family:Arial,sans-serif">'.$key.':</span></strong><span style="font-size:9pt;font-family:Arial,sans-serif"></span></div></td><td style="border:none;border-bottom:solid #d4d4d4 1.0pt;padding:7.5pt 7.5pt 7.5pt 7.5pt"><div><span style="font-size:9pt;font-family:Arial,sans-serif">'.$value.'</span></div></td><td style="padding:7.5pt 7.5pt 7.5pt 7.5pt"></td></tr><tr><td style="border-top:none;border-left:none;border-bottom:solid #d4d4d4 1.0pt;border-right:solid #d4d4d4 1.0pt;padding:7.5pt 7.5pt 7.5pt 7.5pt">';
-    } 
-    $message .= '</tbody></table></div>';
-    //if (P_DEBUG) error_log('Constructed message'.$message);
-    $headers = array('Content-Type: text/html; charset=UTF-8');
-    wp_mail( $to, $subject, $message, $headers );
-  	die(); // this is required to return a proper result
+    if (empty($to)) {
+      if (P_DEBUG) error_log('Skip mail because no addressees set');
+    } else {
+      if (P_DEBUG) error_log('Sending mail to: '.$to);
+      $subject = 'Trial request';
+      $json = urldecode($_POST['json']);
+      if (P_DEBUG) error_log('JSON received'.$json);
+      $a = json_decode($json, true);
+      //if (P_DEBUG) error_log('parsed: '.$a);
+      $message = '<div align="center"><table style="width:6.25in" border="0" cellpadding="0" cellspacing="0" width="600"><tbody>';
+      $message .= '<tr><td colspan="3" style="border:none;border-bottom:solid #d4d4d4 1.0pt;padding:7.5pt 7.5pt 7.5pt 7.5pt"><p  style="text-align:center" align="center"><strong><i><span style="font-size:15.0pt;font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;color:#4696d1">'.$a['pn'].'Trial Request</span></i></strong><i><span style="font-size:15.0pt;font-family:&quot;Arial&quot;,&quot;sans-serif&quot;;color:#4696d1"><u></u><u></u></span></i></p></td></tr><tr style="height:3.75pt"><td colspan="3" style="background:#e2ecf1;padding:7.5pt 7.5pt 7.5pt 7.5pt;height:3.75pt"></td></tr>';
+      foreach ($a as $key => $value) {
+        $message .= '<tr><td style="border-top:none;border-left:none;border-bottom:solid #d4d4d4 1.0pt;border-right:solid #d4d4d4 1.0pt;padding:7.5pt 7.5pt 7.5pt 7.5pt"><div ><strong><span style="font-size:9pt;font-family:Arial,sans-serif">'.$key.':</span></strong><span style="font-size:9pt;font-family:Arial,sans-serif"></span></div></td><td style="border:none;border-bottom:solid #d4d4d4 1.0pt;padding:7.5pt 7.5pt 7.5pt 7.5pt"><div><span style="font-size:9pt;font-family:Arial,sans-serif">'.$value.'</span></div></td><td style="padding:7.5pt 7.5pt 7.5pt 7.5pt"></td></tr><tr><td style="border-top:none;border-left:none;border-bottom:solid #d4d4d4 1.0pt;border-right:solid #d4d4d4 1.0pt;padding:7.5pt 7.5pt 7.5pt 7.5pt">';
+      }
+      $message .= '</tbody></table></div>';
+      //if (P_DEBUG) error_log('Constructed message'.$message);
+      $headers = array('Content-Type: text/html; charset=UTF-8');
+      wp_mail( $to, $subject, $message, $headers );
+  	}
+    die(); // this is required to return a proper result
   }
   if (P_DEBUG) error_log('Adding send mail ajax action');
   add_action( 'wp_ajax_p_send_mail', 'p_send_mail_callback' );
