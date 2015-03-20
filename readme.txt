@@ -27,6 +27,7 @@ The plugin is provided via the WordPress.org repository as well as as a zip file
 === Attributes that may be used in p_form shortcode ===
 
 * id (mandatory): The id of the form this shortcode will embed. 
+* button_text: The text for the form's button. If omitted it will be 'Submit'. This will become the key to look up the button text in the future when the plugin is localised.
 * callback: An optional WordPress action to invoke on submit, may be used in addition or instead of sending Omny Link a message. See http://codex.wordpress.org/AJAX_in_Plugins for how to write WordPress AJAX actions.
 * msg_name: The name to identify the JSON message sent to the Omny Link server. This message will be used to identify the correct handler.
 * msg_pattern: The message exchange pattern to interact with Omny Link, one of: none, inOnly, inOut. Default is 'none'.
@@ -64,14 +65,18 @@ The plugin is configured to send the form content to the Omny Link workflow serv
 
 == Changelog ==
 
-= 0.9.6 =
+=== 0.9.7 ===
+
+- Add option to override the button text to the shortcode. 
+
+=== 0.9.6 ===
 - **NOTE** Changed redirect to be off by default 
 - Add support for proxying requests to server so that requests secured with app credentials rather than individual can be made without exposing the credentials in the browser. 
 
-= 0.9.5 =
+=== 0.9.5 ===
 Bug fix that prevented use of empty shortcode (i.e. had to use the form [p_form...]...[/p_form]
 
-= 0.9.4 =
+=== 0.9.4 ===
 This is the first version of the plugin made publically available. 
 
 == Upgrade Notice ==

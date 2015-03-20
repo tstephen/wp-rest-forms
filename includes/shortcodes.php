@@ -3,6 +3,7 @@
   // shortcode [p_form id="id of form post" title="Form label"]
   function p_form_shortcode( $atts, $content = null ) {
     $a = shortcode_atts( array(
+      'button_text' => 'Submit',
       'callback' => null,
       'id' => '',
       'msg_name' => '',
@@ -49,7 +50,7 @@ error_log('no redirect');
 error_log('with redirect');
       $a['redirect_to'] = '\''.$a['redirect_to'].'\'';
     }
-    $temp_content .= '<button data-p-action="if (document.getElementById(\''.$form->post_name.'\').checkValidity()) $p.sendMessage(\''.$a['msg_pattern'].'\', \''.$options->get_message_namespace().'.'.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).','.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].'); else $p.showFormError(\''.$form->post_name.'\',\'Please correct form errors\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">Submit</button>';
+    $temp_content .= '<button data-p-action="if (document.getElementById(\''.$form->post_name.'\').checkValidity()) $p.sendMessage(\''.$a['msg_pattern'].'\', \''.$options->get_message_namespace().'.'.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).','.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].'); else $p.showFormError(\''.$form->post_name.'\',\'Please correct form errors\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">'.$a['button_text'].'</button>';
     $temp_content .= '</form>';
 
     ob_end_clean();
