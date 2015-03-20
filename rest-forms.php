@@ -4,13 +4,13 @@
  * Plugin URI: http://knowprocess.com/wp-plugins/rest-forms
  * Description: Integrates web APIs with your WordPress app.
  * Author: Tim Stephenson
- * Version: 0.9.5
+ * Version: 0.9.6
  * Author URI: http://omny.link
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '0.9.5');
+  define('P_VERSION', '0.9.6');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
@@ -40,8 +40,7 @@
       <script type="text/javascript">jQuery(document).ready(function(){
         $p.server='<?php echo $p_options->get_api_url(); ?>';
         $p.tenant='<?php echo $p_options->get_message_namespace(); ?>';
-        $p.k='<?php echo $p_options->get_api_key(); ?>';
-        $p.v='<?php echo $p_options->get_api_secret(); ?>';
+        $p.proxyApi = '<?php echo $p_options->is_proxy_required() ?>'==1 ? true : false;
         $.ajaxSetup({xhrFields: {withCredentials: true}});
       });</script>
     <?php
@@ -68,7 +67,7 @@
     wp_enqueue_script(
       P_ID.'-client',
       plugins_url( 'js/'.P_ID.'-'.P_VERSION.(P_DEBUG ? '' : '.min').'.js', __FILE__ ),
-      array( 'jquery' ),
+      array( 'jquery', 'jquery-ui-autocomplete' ),
       null, /* Force no version as query string */
       true /* Force load in footer */
     );

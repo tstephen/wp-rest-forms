@@ -30,7 +30,13 @@ The plugin is provided via the WordPress.org repository as well as as a zip file
 * callback: An optional WordPress action to invoke on submit, may be used in addition or instead of sending Omny Link a message. See http://codex.wordpress.org/AJAX_in_Plugins for how to write WordPress AJAX actions.
 * msg_name: The name to identify the JSON message sent to the Omny Link server. This message will be used to identify the correct handler.
 * msg_pattern: The message exchange pattern to interact with Omny Link, one of: none, inOnly, inOut. Default is 'none'.
-* redirect_to: The url to redirect the user to once the form is submitted. Default is '/'.
+* redirect_to: The url to redirect the user to once the form is submitted. Default is no redirect (by setting the param to undefined).
+
+For example: 
+
+* To embed form with id 123, send no data to the Omny Server and redirect to page 'thanks-for-your-message' and including the slug of the page the form is embedded in use: 
+
+`[p_form id="123" redirect_to="/thanks-for-your-message"]source_page=contact-us[/p_form]`
 
 === Passing constants to a form ===
 
@@ -57,6 +63,13 @@ The plugin is configured to send the form content to the Omny Link workflow serv
 2. Embedding the shortcode in a page and passing the additional property 'product name'.
 
 == Changelog ==
+
+= 0.9.6 =
+- **NOTE** Changed redirect to be off by default 
+- Add support for proxying requests to server so that requests secured with app credentials rather than individual can be made without exposing the credentials in the browser. 
+
+= 0.9.5 =
+Bug fix that prevented use of empty shortcode (i.e. had to use the form [p_form...]...[/p_form]
 
 = 0.9.4 =
 This is the first version of the plugin made publically available. 

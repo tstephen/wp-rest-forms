@@ -34,6 +34,15 @@ class FormsOptions {
       }
     }
 
+    public function is_proxy_required() {
+      if (!empty($this->options['api_key'])
+              && !empty($this->options['api_secret'])) {
+          return True;
+      } else {
+          return False;
+      }
+    }
+
     public function get_mail_addressee() {
       return $this->options['mail_addressee'];
     }

@@ -79,4 +79,62 @@
   if (P_DEBUG) error_log('Adding send mail ajax action');
   add_action( 'wp_ajax_p_send_mail', 'p_send_mail_callback' );
   add_action( 'wp_ajax_nopriv_p_send_mail', 'p_send_mail_callback' );
+
+  function p_proxy_callback() {
+    if (P_DEBUG) error_log('Call to p_proxy_callback');
+
+    if ($_SERVER['REQUEST_METHOD']=='GET') {
+      $msg = $_REQUEST['query'];
+      $msg_field = 'query';
+    } else { 
+      $msg = $_REQUEST['json'];
+      $msg_field = 'json';
+    } 
+    $msg = str_replace('\\','',$msg);
+
+    $headers[] = '';
+
+    if ($p_options == null) $p_options = new FormsOptions();
+    $msg_namespace = $p_options->get_message_namespace();
+    // NOTE this will be already prefixed with tenant id / msg ns by shortcode
+    $msg_name = $_REQUEST['msg_name'];
+    $url = $p_options->get_api_url().'msg/'.$p_options->get_message_namespace().'/'.$msg_name;
+    if (P_DEBUG) {
+      error_log('Notifying server: ');
+      error_log('  URL: '.$url);
+      error_log('  Message name: '.$msg_name);
+      error_log('  JSON: '.$msg);
+    }
+    $fields = array(
+      $msg_field => $msg
+    );
+    //$response = http_post_fields(P_API_URL.$msg_name, array('timeout'=>1), $fields);
+
+    if ($_SERVER['REQUEST_METHOD']=='GET') {
+      // IMPLIED curl_setopt($curl_handle, CURLOPT_HTTPGET, TRUE);
+      $url = $url.'?'.$msg_field.'='.$msg;
+      if (P_DEBUG) error_log('  query string:'.$url);
+      $ch = curl_init($url);
+    } else { 
+      $ch = curl_init($url);
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+    }
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+      'Origin: '.get_site_url()
+    ));
+    curl_setopt($ch, CURLOPT_USERPWD, $p_options->get_api_key().":".$p_options->get_api_secret());
+
+    $response = curl_exec($ch);
+    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if (P_DEBUG || $http_status >=300) error_log('Response from '.$url.': '.$http_status);
+    curl_close($ch);
+    echo $response;
+
+    die(); // this is required to return a proper result
+  }
+  if (P_DEBUG) error_log('Adding proxy ajax action');
+  add_action( 'wp_ajax_p_proxy', 'p_proxy_callback' );
+  add_action( 'wp_ajax_nopriv_p_proxy', 'p_proxy_callback' );
 ?>
