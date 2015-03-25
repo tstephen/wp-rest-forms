@@ -112,7 +112,7 @@
 
     if ($_SERVER['REQUEST_METHOD']=='GET') {
       // IMPLIED curl_setopt($curl_handle, CURLOPT_HTTPGET, TRUE);
-      $url = $url.'?'.$msg_field.'='.$msg;
+      $url = $url.'?'.$msg_field.'='.urlencode($msg);
       if (P_DEBUG) error_log('  query string:'.$url);
       $ch = curl_init($url);
     } else { 
