@@ -48,9 +48,10 @@
    * Adds meta boxes to the form editing screen
    */
   function p_custom_meta() {
-    add_meta_box( 'p_meta', __( 'Generate form control', P_TEXT_DOMAIN ), 'p_meta_callback', 'p_form', 'side', 'high');
+    add_meta_box( 'p_meta_domain', __( 'Add pre-defined field', P_TEXT_DOMAIN ), 'p_meta_domain_callback', 'p_form', 'side', 'high');
+    add_meta_box( 'p_meta', __( 'Generate custom field', P_TEXT_DOMAIN ), 'p_meta_callback', 'p_form', 'side', 'high');
     add_meta_box( 'p_meta_help', __( 'Help on form controls', P_TEXT_DOMAIN ), 'p_meta_help_callback', 'p_form', 'normal', 'high');
-    //remove_meta_box( 'postcustom' , 'p_form' , 'normal' ); 
+    //remove_meta_box( 'postcustom' , 'p_form' , 'normal' );
   }
   add_action( 'add_meta_boxes', 'p_custom_meta' );
 
@@ -106,6 +107,29 @@
           value="<?php _e( 'Add control', P_TEXT_DOMAIN )?>" />
     </p>
 
+    <?php
+  }
+
+  /**
+   * Outputs the meta box containing tools for creating form controls.
+   */
+  function p_meta_domain_callback( $post ) {
+    wp_nonce_field( basename( __FILE__ ), 'p_nonce' );
+    // TODO not sure why this is not being called on init, but it is not
+    p_load_scripts();
+    $options = new FormsOptions();
+    ?>
+
+    <p>
+      <label for="domainCtrl"><?php _e( 'Field Name', P_TEXT_DOMAIN )?></label><br/>
+      <input class="autocomplete" data-p-ready="$p.initDomainModel()" type="text" name="domainCtrl" id="domainCtrl" />
+    </p>
+
+    <p>
+      <input type="button" id="addDomainCtrl" class="button"
+          onclick="$p.addDomainControl();"
+          value="<?php _e( 'Add control', P_TEXT_DOMAIN )?>" />
+    </p>
 
     <?php
   }
@@ -120,7 +144,7 @@ error_log('Called help renderer');
     p_load_scripts();
     ?>
     <p>
-      Form controls can take advantage of any HTML features, so for example to make something a required field simply use the required attribute on any form control. Similarly, standard html layout tags such as &lt;ul> and &lt;span> may be used. 
+      Form controls can take advantage of any HTML features, so for example to make something a required field simply use the required attribute on any form control. Similarly, standard html layout tags such as &lt;ul> and &lt;span> may be used.
     </p>
     <p>
       To provide a rich user interface including labels, hint text and validation with the minimum form definition <i><?php echo P_NAME ?></i> enhances the form at runtime based on the following rules, <b><em>if</em> the control has the 'decorate' CSS class:</b>

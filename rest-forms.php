@@ -4,13 +4,13 @@
  * Plugin URI: http://knowprocess.com/wp-plugins/rest-forms
  * Description: Integrates web APIs with your WordPress app.
  * Author: Tim Stephenson
- * Version: 0.9.7
+ * Version: 0.10.0
  * Author URI: http://omny.link
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '0.9.7');
+  define('P_VERSION', '0.10.0');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 

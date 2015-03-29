@@ -86,10 +86,10 @@
     if ($_SERVER['REQUEST_METHOD']=='GET') {
       $msg = $_REQUEST['query'];
       $msg_field = 'query';
-    } else { 
+    } else {
       $msg = $_REQUEST['json'];
       $msg_field = 'json';
-    } 
+    }
     $msg = str_replace('\\','',$msg);
 
     $headers[] = '';
@@ -98,6 +98,9 @@
     $msg_namespace = $p_options->get_message_namespace();
     // NOTE this will be already prefixed with tenant id / msg ns by shortcode
     $msg_name = $_REQUEST['msg_name'];
+    if (!endsWith($msg_name,'.json')) {
+      $msg_name = $msg_name.'.json';
+    }
     $url = $p_options->get_api_url().'msg/'.$p_options->get_message_namespace().'/'.$msg_name;
     if (P_DEBUG) {
       error_log('Notifying server: ');
@@ -106,7 +109,8 @@
       error_log('  JSON: '.$msg);
     }
     $fields = array(
-      $msg_field => $msg
+      $msg_field => $msg,
+      'businessDescription' => $_REQUEST['businessDescription']
     );
     //$response = http_post_fields(P_API_URL.$msg_name, array('timeout'=>1), $fields);
 
@@ -115,7 +119,7 @@
       $url = $url.'?'.$msg_field.'='.urlencode($msg);
       if (P_DEBUG) error_log('  query string:'.$url);
       $ch = curl_init($url);
-    } else { 
+    } else {
       $ch = curl_init($url);
       curl_setopt($ch, CURLOPT_POST, true);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
@@ -137,4 +141,56 @@
   if (P_DEBUG) error_log('Adding proxy ajax action');
   add_action( 'wp_ajax_p_proxy', 'p_proxy_callback' );
   add_action( 'wp_ajax_nopriv_p_proxy', 'p_proxy_callback' );
+
+  function p_domain_callback() {
+    if (P_DEBUG) error_log('Call to p_domain_callback');
+    p_internal_proxy_callback('/domain/?projection=complete');
+  } 
+  if (P_DEBUG) error_log('Adding domain ajax action');
+  add_action( 'wp_ajax_p_domain', 'p_domain_callback' );
+  add_action( 'wp_ajax_nopriv_p_domain', 'p_domain_callback' );
+
+  function p_resource_callback() {
+    if (P_DEBUG) error_log('Call to p_resource_callback');
+    p_internal_proxy_callback($_REQUEST['resource']);
+  } 
+  if (P_DEBUG) error_log('Adding resource ajax action');
+  add_action( 'wp_ajax_p_resource', 'p_resource_callback' );
+  add_action( 'wp_ajax_nopriv_p_resource', 'p_resource_callback' );
+
+  function p_internal_proxy_callback( $resource ) {
+    if (P_DEBUG) error_log('Call to p_domain_callback');
+
+    if ($p_options == null) $p_options = new FormsOptions();
+    $url = $p_options->get_api_url().$p_options->get_message_namespace().$resource;
+    if (P_DEBUG) {
+      error_log('Fetch resource: ');
+      error_log('  URL: '.$url);
+    }
+
+    // IMPLIED curl_setopt($curl_handle, CURLOPT_HTTPGET, TRUE);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+      'Origin: '.get_site_url()
+    ));
+    curl_setopt($ch, CURLOPT_USERPWD, $p_options->get_api_key().":".$p_options->get_api_secret());
+
+    $response = curl_exec($ch);
+    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if (P_DEBUG || $http_status >=300) error_log('Response from '.$url.': '.$http_status);
+    curl_close($ch);
+    echo $response;
+
+    die(); // this is required to return a proper result
+  }
+
+  function startsWith($haystack, $needle) {
+      // search backwards starting from haystack length characters from the end
+      return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
+  }
+  function endsWith($haystack, $needle) {
+      // search forward starting from end minus needle length characters
+      return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== FALSE);
+  }
 ?>
