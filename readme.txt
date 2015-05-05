@@ -84,7 +84,9 @@ The plugin is configured to send the form content to the Omny Link workflow serv
 
 === 0.10.0 ===
 
-- New dashboard panel to pick form fields from domain model 
+- New widget to display a small number of the most recently changed contacts in your Omny Link customer management system.  
+- New panel to pick form fields directly from the domain model
+- Clearer separation of settings into Standalone and Enhanced modes.
 
 === 0.9.7 ===
 

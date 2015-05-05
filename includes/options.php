@@ -119,38 +119,6 @@ class FormsOptions {
         );
 
         add_settings_field(
-            'api_url', // ID
-            'API Server URL', // Label
-            array( $this, 'p_api_url_callback' ), // Callback
-            'p_settings_admin',
-            'p_setting_section_general'
-        );
-
-        add_settings_field(
-            'api_key', // ID
-            'API Key', // Label
-            array( $this, 'p_api_key_callback' ), // Callback
-            'p_settings_admin',
-            'p_setting_section_general'
-        );
-
-        add_settings_field(
-            'api_secret', // ID
-            'API Secret', // Label
-            array( $this, 'p_api_secret_callback' ), // Callback
-            'p_settings_admin',
-            'p_setting_section_general'
-        );
-
-        add_settings_field(
-            'mail_addressee', // ID
-            'Mail Addressee', // Label
-            array( $this, 'p_mail_addressee_callback' ), // Callback
-            'p_settings_admin',
-            'p_setting_section_general'
-        );
-
-        add_settings_field(
             'debug', // ID
             'Enable debug output', // Label
             array( $this, 'p_debug_callback' ), // Callback
@@ -158,12 +126,58 @@ class FormsOptions {
             'p_setting_section_general' // Section
         );
 
+        add_settings_section(
+            'p_setting_section_standalone', // ID
+            'Standalone Settings', // Title
+            array( $this, 'p_print_standalone_section_info' ), // Callback
+            'p_settings_admin' // Page
+        );
+
+        add_settings_field(
+            'mail_addressee', // ID
+            'Mail Addressee', // Label
+            array( $this, 'p_mail_addressee_callback' ), // Callback
+            'p_settings_admin',
+            'p_setting_section_standalone'
+        );
+
+        add_settings_section(
+            'p_setting_section_server', // ID
+            'Server Settings', // Title
+            array( $this, 'p_print_server_section_info' ), // Callback
+            'p_settings_admin' // Page
+        );
+
+        add_settings_field(
+            'api_url', // ID
+            'API Server URL', // Label
+            array( $this, 'p_api_url_callback' ), // Callback
+            'p_settings_admin',
+            'p_setting_section_server'
+        );
+
+        add_settings_field(
+            'api_key', // ID
+            'API Key', // Label
+            array( $this, 'p_api_key_callback' ), // Callback
+            'p_settings_admin',
+            'p_setting_section_server'
+        );
+
+        add_settings_field(
+            'api_secret', // ID
+            'API Secret', // Label
+            array( $this, 'p_api_secret_callback' ), // Callback
+            'p_settings_admin',
+            'p_setting_section_server'
+        );
+
         add_settings_field(
             'message_namespace', // ID
             'Message namespace', // Label
             array( $this, 'p_message_namespace_callback' ), // Callback
             'p_settings_admin', // Page
-            'p_setting_section_general' // Section
+            'p_setting_section_server' // Section
         );
 
         add_settings_section(
@@ -215,7 +229,7 @@ class FormsOptions {
      * Print the leader text for the general section.
      */
     public function p_print_general_section_info() {
-        print 'Enter your settings below:';
+        print '<p>The plugin can work in <b>stand-alone</b> mode or in <b>enhanced</b> server mode. To enable enhanced mode you need to register to use the API at <a href="http://omny.link" target="_blank">Omny.Link</a>.</p>';
     }
 
     /**
@@ -229,6 +243,13 @@ class FormsOptions {
     }
 
     /**
+     * Print the leader text for the standalone section.
+     */
+    public function p_print_standalone_section_info() {
+        print '<p>In stand-alone mode form contents are simply emailed to the specified addressee.</p>';
+    }
+
+    /**
      * Output textbox for 'mail_addressee' option.
      */
     public function p_mail_addressee_callback() {
@@ -236,6 +257,14 @@ class FormsOptions {
             '<input type="text" id="mail_addressee" name="'.P_ID.'_options[mail_addressee]" value="%s" />',
             isset( $this->options['mail_addressee'] ) ? esc_attr( $this->options['mail_addressee']) : ''
         );
+    }
+
+    /**
+     * Print the leader text for the server section.
+     */
+    public function p_print_server_section_info() {
+        print '<p>In enhanced mode form contents are sent as a JSON message to the Omny Link server where they can be handled by a custom workflow.</p>';
+        print '<p>Request your trial Omny Link account <a href="http://omny.link/about-us/register-for-trial">here</a>.</p>';
     }
 
     /**

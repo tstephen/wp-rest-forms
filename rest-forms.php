@@ -20,8 +20,10 @@
   if (P_DEBUG) error_log(P_NAME.' debug logging is on');
 
   require_once("includes/ajax_support.php");
+  require_once("includes/contacts_widget.php");
   require_once("includes/events.php");
   require_once("includes/shortcodes.php");
+  //require_once("includes/tasks_widget.php");
   require_once("includes/forms.php");
 
   if ( is_admin() ) {
@@ -68,6 +70,13 @@
       P_ID.'-client',
       plugins_url( 'js/'.P_ID.'-'.P_VERSION.(P_DEBUG ? '' : '.min').'.js', __FILE__ ),
       array( 'jquery', 'jquery-ui-autocomplete' ),
+      null, /* Force no version as query string */
+      true /* Force load in footer */
+    );
+    wp_enqueue_script(
+      'i18n',
+      plugins_url( 'js/i18n.js', __FILE__ ),
+      array(),
       null, /* Force no version as query string */
       true /* Force load in footer */
     );

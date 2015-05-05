@@ -48,6 +48,7 @@ function App() {
   //this.server = 'http://localhost:9090';
   this.onInitCallbacks = $.Callbacks();
   this.init = function() {
+    $p.l10n = new I18nController();
     $p.bind();
     $.ajaxSetup({
       username: $p.k,
@@ -62,6 +63,20 @@ function App() {
   };
   this.ensureInited = function(d) {
     if (d == undefined) d = {};
+  };
+  this.fetchAndRender = function(url,varName,templateSelector,containerSelector) { 
+    console.log('fetchAndRender');
+    $.getJSON(url,function(response) {
+      $.each(response,function(i,d) {
+        d.age = $p.l10n.getAgeString(new Date(d.lastUpdated));
+      });
+      $p[varName]=response;
+      //  $(containerSelector).html($(templateSelector).html()).moustache($p);
+      //Mustache.parse(jQuery('#contactsTemplate').html()); 
+      var rendered = Mustache.render(jQuery('#contactsTemplate').html(), $p);
+console.log('rendered starts: '+rendered.substring(0,500));
+      $(containerSelector).html(rendered);
+    });
   };
   this.initObj = function(d,dataAttr) {
     //console.log('init '+d.id+' from '+dataAttr);
@@ -158,6 +173,7 @@ console.log('validation == undefined'+(validation==undefined));
             if (e.name == attr) {
               console.log('found attr:'+JSON.stringify(e));
               $p._addControl(e.name, e.type, e.label, e.hint, e.required, e.validation);
+              $('#domainCtrl').val('');
             }
           });
         }
