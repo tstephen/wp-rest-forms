@@ -3,9 +3,9 @@
   function p_form_init() {
 
   	$labels = array(
-  		'name'                => _x( 'Omny Link Forms', 'Post Type General Name', 'p_form' ),
-  		'singular_name'       => _x( 'Omny Link Form', 'Post Type Singular Name', 'p_form' ),
-  		'menu_name'           => __( 'Omny Link Forms', 'p_form' ),
+      'name'                => _x( P_NAME, 'Post Type General Name', 'p_form' ),
+      'singular_name'       => _x( rtrim(P_NAME,'s'), 'Post Type Singular Name', 'p_form' ),
+      'menu_name'           => __( P_NAME, 'p_form' ),
   		'parent_item_colon'   => __( 'Parent Form:', 'p_form' ),
   		'all_items'           => __( 'All Forms', 'p_form' ),
   		'view_item'           => __( 'View Form', 'p_form' ),
@@ -30,7 +30,7 @@
   		'show_in_nav_menus'   => true,
   		'show_in_admin_bar'   => true,
   		'menu_position'       => 20,
-      'menu_icon'           => plugins_url('../images/omny-greyscale-icon-20x20.png', __FILE__),
+      'menu_icon'           => plugins_url('../images/omny-greyscale-inverse-icon-20x20.png', __FILE__),
   		'can_export'          => true,
   		'has_archive'         => false,
   		'exclude_from_search' => false,
@@ -66,13 +66,16 @@
 
     <p>
       <label for="ctrlType"><?php _e( 'Control Type', P_TEXT_DOMAIN )?></label><br/>
-      <select name="ctrlType" id="ctrlType">
+      <select name="ctrlType" id="ctrlType" onchange="$p.addControlOptions()">
+        <option value="checkbox"><?php _e( 'Checkbox', P_TEXT_DOMAIN )?></option>';
         <option value="email"><?php _e( 'Email', P_TEXT_DOMAIN )?></option>';
         <option value="tel"><?php _e( 'Telephone', P_TEXT_DOMAIN )?></option>';
         <option value="number"><?php _e( 'Number', P_TEXT_DOMAIN )?></option>';
+        <option value="radio"><?php _e( 'Radio Group', P_TEXT_DOMAIN )?></option>';
         <option value="select"><?php _e( 'Select', P_TEXT_DOMAIN )?></option>';
         <option value="text" selected><?php _e( 'Text', P_TEXT_DOMAIN )?></option>';
         <option value="textarea"><?php _e( 'Textarea', P_TEXT_DOMAIN )?></option>';
+        <option value="url"><?php _e( 'Url', P_TEXT_DOMAIN )?></option>';
       </select>
     </p>
 
@@ -89,6 +92,11 @@
     <p>
       <label for="ctrlPlaceholder"><?php _e( 'Placeholder', P_TEXT_DOMAIN )?></label><br/>
       <input type="text" name="ctrlPlaceholder" id="ctrlPlaceholder" value="<?php if ( isset ( $p_stored_meta['ctrlPlaceholder'] ) ) echo $p_stored_meta['ctrlPlaceholder'][0]; ?>" />
+    </p>
+
+    <p id="ctrlOptionsPara" style="display:none">
+      <label for="ctrlOptions"><?php _e( 'Options (comma-separated list)', P_TEXT_DOMAIN )?></label><br/>
+      <input type="text" name="ctrlOptions" id="ctrlOptions" value="<?php if ( isset ( $p_stored_meta['ctrlOptions'] ) ) echo $p_stored_meta['ctrlOptions'][0]; ?>" />
     </p>
 
     <p>

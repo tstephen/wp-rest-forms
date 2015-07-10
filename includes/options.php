@@ -264,7 +264,7 @@ class FormsOptions {
      */
     public function p_print_server_section_info() {
         print '<p>In enhanced mode form contents are sent as a JSON message to the Omny Link server where they can be handled by a custom workflow.</p>';
-        print '<p>Request your trial Omny Link account <a href="http://omny.link/about-us/register-for-trial">here</a>.</p>';
+        print '<p>Request your trial Omny Link account <a href="http://omny.link/contact-us/">here</a>.</p>';
     }
 
     /**

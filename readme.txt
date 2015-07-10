@@ -82,6 +82,12 @@ The plugin is configured to send the form content to the Omny Link workflow serv
 
 == Changelog ==
 
+=== 0.11.0 ===
+HTML5 polyfill for Firefox and IE date picker support (care of webshim) 
+Form controls: radio and checkbox support added; select allowed to specify options as single attribute for greater concision
+Wordpress Widgets: Top tasks and Events 
+Set business description as shortcode parameter
+
 === 0.10.0 ===
 
 - New widget to display a small number of the most recently changed contacts in your Omny Link customer management system.  
@@ -100,8 +106,67 @@ The plugin is configured to send the form content to the Omny Link workflow serv
 Bug fix that prevented use of empty shortcode (i.e. had to use the form [p_form...]...[/p_form]
 
 === 0.9.4 ===
-This is the first version of the plugin made publically available.
+0.9.4
+-----
+Parse Google AdWords params and merge into message submitted from form.
 
+0.9.3
+-----
+Set Origin header on event publication
+
+0.9.2
+-----
+- Add autoNumeric for formatting numbers within fields
+- Modify hint text behaviour to only show when focused and invalid
+
+0.9.1
+-----
+- Enable optional redirect on successful sendMessage
+- Allow override of the message name sent to server on form submit
+- Check validity of form before submit
+- Fix CSS loading
+- Fix to forms handling
+
+0.9.0
+-----
+- Forms generator (good enough for Firm Gains)
+
+0.8.0
+-----
+- Added options page to allow user control over various settings
+- Allow password to be set when registering user with ajax call
+- Added pages for sending an email or text to subscribers
+- Completed event publication (the sending of the event to KP)
+
+0.7.1
+-----
+- Fix to binding on blur
+- Adopt SSL server (https://api.knowprocess.com)
+
+0.7.0
+-----
+- Add post publication event
+- Add subscription via ajax including setting user meta fields as well as creating account
+
+0.6.0
+-----
+- Add support for radio inputs annotated with data-p-bind
+- Added polyfill to allow use of console in older IE browsers
+- Make email loadTemplates conditional to minimise chance of missing templates impacting other functionality
+
+0.5.1
+-----
+- Fix initialisation bug that made plugin not play nice with FirmGains theme.
+- Added role check so may only be used by users with admin role.
+- Allow pages to be found in theme directory as well as inside plugin itself.
+- Merge email and workflow-ui js files.
+- Minify JS when debug set to false.
+
+0.5.0
+-----
+- First time JS was packaged as a proper WP plugin.
+- Added shortcode to send pro-forma mail.
+                                                        
 == Upgrade Notice ==
 
 This is the first version of the plugin made publically available.

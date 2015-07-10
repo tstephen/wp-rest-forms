@@ -3,6 +3,7 @@
   // shortcode [p_form id="id of form post" title="Form label"]
   function p_form_shortcode( $atts, $content = null ) {
     $a = shortcode_atts( array(
+      'business_description' => null,
       'button_text' => 'Submit',
       'callback' => null,
       'id' => '',
@@ -22,6 +23,14 @@
     $form_content = $form->post_content;
     $form_content = apply_filters('the_content', $form_content);
     $form_content = str_replace(']]>', ']]&gt;', $form_content);
+
+    $temp_content .= '<script>';
+    $temp_content .= '  webshims.setOptions("waitReady", false);';
+    // No UK locale, but AU sets date format just fine!
+    $temp_content .= '  webshims.activeLang("en-AU");';
+    $temp_content .= '  webshims.setOptions("forms-ext", { types: "date", "widgets": { "size": 2, "startView": 2, "openOnFocus": true } });';
+    $temp_content .= '  webshims.polyfill("forms forms-ext");';
+    $temp_content .= '</script>';
 
     $temp_content .= '<form class="p-form" id="'.$form->post_name.'">';
     $temp_content .= '<div class="p-messages"></div>';
@@ -51,7 +60,7 @@ error_log('with redirect');
       $a['redirect_to'] = '\''.$a['redirect_to'].'\'';
     }
     $temp_content .= '<div class="p-messages"></div>';
-    $temp_content .= '<button data-p-action="if (document.getElementById(\''.$form->post_name.'\').checkValidity()) $p.sendMessage(\''.$a['msg_pattern'].'\', \''.$options->get_message_namespace().'.'.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).','.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].'); else $p.showFormError(\''.$form->post_name.'\',\'Please correct highlighted fields\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">'.$a['button_text'].'</button>';
+    $temp_content .= '<button class="btn" data-p-action="$p.sendMessageIfValid(\''.$form->post_name.'\',\''.$a['msg_pattern'].'\', \''.$options->get_message_namespace().'.'.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).','.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].',\''.$a['business_description'].'\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">'.$a['button_text'].'</button>';
     $temp_content .= '</form>';
 
     ob_end_clean();

@@ -1,16 +1,16 @@
 <?php
 /*
  * Plugin Name: Omny Link Forms
- * Plugin URI: http://knowprocess.com/wp-plugins/rest-forms
+ * Plugin URI: http://omny.link/solutions/omny-link-forms/
  * Description: Integrates web APIs with your WordPress app.
- * Author: Tim Stephenson
- * Version: 0.10.0
+ * Author: Omny Link
+ * Version: 0.11.0
  * Author URI: http://omny.link
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '0.10.0');
+  define('P_VERSION', '0.11.0');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
@@ -22,8 +22,10 @@
   require_once("includes/ajax_support.php");
   require_once("includes/contacts_widget.php");
   require_once("includes/events.php");
+  require_once("includes/events_widget.php");
+  require_once("includes/tasks_widget.php");
   require_once("includes/shortcodes.php");
-  //require_once("includes/tasks_widget.php");
+  require_once("includes/tasks_widget.php");
   require_once("includes/forms.php");
 
   if ( is_admin() ) {
@@ -66,6 +68,7 @@
   function p_load_scripts() {
     if (P_DEBUG) error_log('Loading scripts for '.P_ID.' plugin');
     // used for both admin and front end
+
     wp_enqueue_script(
       P_ID.'-client',
       plugins_url( 'js/'.P_ID.'-'.P_VERSION.(P_DEBUG ? '' : '.min').'.js', __FILE__ ),
@@ -84,6 +87,20 @@
     if ( is_admin() ) {
       ;
     } else {
+      wp_enqueue_script(
+        'webshim-modernizr',
+        'http://cdn.jsdelivr.net/webshim/1.12.4/extras/modernizr-custom.js',
+        array( 'jquery' ),
+        null, /* Force no version as query string */
+        false /* Force load in header */
+      );
+      wp_enqueue_script(
+        'webshim',
+        'http://cdn.jsdelivr.net/webshim/1.12.4/polyfiller.js',
+        array( 'jquery' ),
+        null, /* Force no version as query string */
+        false /* Force load in header */
+      );
       wp_enqueue_script(
         'moustache.js',
         plugins_url( 'js/moustache.js', __FILE__ ),
