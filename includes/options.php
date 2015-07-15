@@ -1,5 +1,6 @@
 <?php
-define('P_API_URL', 'https://api.knowprocess.com');
+
+define('P_API_URL', 'https://api.omny.link');
 class FormsOptions {
 
     /**
@@ -18,10 +19,22 @@ class FormsOptions {
         $this->options = get_option( P_ID.'_options' );
     }
 
-    public function is_debug_on() {
-      return isset( $this->options['debug'] ) && $this->options['debug'] == True;
+    public function is_logging_level_debug() {
+      return isset( $this->options['log_level'] ) && ($this->options['log_level'] == 'debug');
     }
 
+    public function is_logging_level_info() {
+      return isset( $this->options['log_level'] ) && ($this->options['log_level'] == 'info' || $this->options['log_level'] == 'debug');
+    }
+    
+    public function is_logging_level_warning() {
+      return isset( $this->options['log_level'] ) && ($this->options['log_level'] == 'warning' || $this->options['log_level'] == 'info' || $this->options['log_level'] == 'debug');
+    }
+    
+    public function is_logging_level_error() {
+      return isset( $this->options['log_level'] ) && ($this->options['log_level'] == 'error' || $this->options['log_level'] == 'warning' || $this->options['log_level'] == 'info' || $this->options['log_level'] == 'debug');
+    }
+    
     public function is_fully_configured() {
       if (!empty($this->options['api_url'])
               && !empty($this->options['message_namespace'])
@@ -118,10 +131,18 @@ class FormsOptions {
             'p_settings_admin' // Page
         );
 
-        add_settings_field(
+        /*add_settings_field(
             'debug', // ID
             'Enable debug output', // Label
             array( $this, 'p_debug_callback' ), // Callback
+            'p_settings_admin', // Page
+            'p_setting_section_general' // Section
+        );*/
+
+        add_settings_field(
+            'log_level', // ID
+            'Enable logging level', // Label
+            array( $this, 'p_log_level_callback' ), // Callback
             'p_settings_admin', // Page
             'p_setting_section_general' // Section
         );
@@ -216,6 +237,11 @@ class FormsOptions {
         if( isset( $input['debug'] ) )
             $new_input['debug'] = true ;
 
+        if( isset( $input['log_level'] ) ) {
+            error_log('Setting new logging level to: '.$input['log_level']);
+            $new_input['log_level'] = $input['log_level'] ;
+        }
+
         if( isset( $input['message_namespace'] ) )
             $new_input['message_namespace'] = sanitize_text_field( $input['message_namespace'] );
 
@@ -242,6 +268,19 @@ class FormsOptions {
         );
     }
 
+    /**
+     * Output drop down for logging level.
+     */
+    public function p_log_level_callback() {
+        printf(
+            '<select id="log_level" name="'.P_ID.'_options[log_level]"><option value="debug" %s>Debug</option><option value="info" %s>Info</option><option value="warning" %s>Warning</option><option value="error" %s>Error</option></select>',
+            isset( $this->options['log_level'] ) && $this->options['log_level'] == 'debug' ? 'selected' : '',
+            isset( $this->options['log_level'] ) && $this->options['log_level'] == 'info' ? 'selected' : '',
+            isset( $this->options['log_level'] ) && $this->options['log_level'] == 'warning' ? 'selected' : '',
+            isset( $this->options['log_level'] ) && $this->options['log_level'] == 'error' ? 'selected' : ''                                    
+        );
+    }
+    
     /**
      * Print the leader text for the standalone section.
      */
@@ -326,6 +365,21 @@ class FormsOptions {
     public function p_print_event_section_info() {
         print 'Check the events you would like to publish:';
     }
+}
+
+function p_init_logging() {
+  define("P_DEBUG", $GLOBALS['p_options']->is_logging_level_debug());
+  define("P_INFO", $GLOBALS['p_options']->is_logging_level_info());
+  define("P_WARNING", $GLOBALS['p_options']->is_logging_level_warning());
+  define("P_ERROR", $GLOBALS['p_options']->is_logging_level_error());
+  
+  if (P_DEBUG) { 
+    if (P_DEBUG) error_log(P_NAME.' debug logging is on');
+    else if (P_INFO) error_log(P_NAME.' info logging is on');
+    else if (P_WARNING) error_log(P_NAME.' warning logging is on');
+    else if (P_ERROR) error_log(P_NAME.' error logging is on');
+    else error_log('No '.P_NAME.' logging is on, configure it in the settings page');
+  }
 }
 
 function starts_with($haystack, $needle) {

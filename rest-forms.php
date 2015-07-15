@@ -4,20 +4,19 @@
  * Plugin URI: http://omny.link/solutions/omny-link-forms/
  * Description: Integrates web APIs with your WordPress app.
  * Author: Omny Link
- * Version: 0.12.0
+ * Version: 0.11.1
  * Author URI: http://omny.link
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '0.12.0');
+  define('P_VERSION', '0.11.1');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
   require_once("includes/options.php");
-  if ($p_options == null) $p_options = new FormsOptions();
-  define("P_DEBUG", $p_options->is_debug_on());
-  if (P_DEBUG) error_log(P_NAME.' debug logging is on');
+  if ($GLOBALS['p_options'] == null) $GLOBALS['p_options'] = new FormsOptions();
+  p_init_logging();
 
   require_once("includes/ajax_support.php");
   require_once("includes/contacts_widget.php");

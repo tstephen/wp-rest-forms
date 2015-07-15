@@ -82,6 +82,9 @@ The plugin is configured to send the form content to the Omny Link workflow serv
 
 == Changelog ==
 
+=== 0.11.1 ===
+Fix proxy support for sendIntermediateEvent
+
 === 0.11.0 ===
 HTML5 polyfill for Firefox and IE date picker support (care of webshim) 
 Form controls: radio and checkbox support added; select allowed to specify options as single attribute for greater concision

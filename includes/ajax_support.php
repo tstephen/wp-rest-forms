@@ -1,6 +1,9 @@
 <?php
 
   function p_register_async_callback() {
+    require_once( plugin_dir_path( __FILE__ ).'options.php' );
+    p_init_logging();
+
     if (P_DEBUG) error_log('Call to p_register_async_callback');
     $user_id = get_current_user_id();
   	$user_name = $_POST['log'];
@@ -51,6 +54,9 @@
   add_action( 'wp_ajax_nopriv_p_register_async', 'p_register_async_callback' );
 
   function p_send_mail_callback() {
+    require_once( plugin_dir_path( __FILE__ ).'options.php' );
+    p_init_logging();
+
     if (P_DEBUG) error_log('Call to p_send_mail_callback');
 
     $options = get_option( P_ID.'_options' );
@@ -81,6 +87,9 @@
   add_action( 'wp_ajax_nopriv_p_send_mail', 'p_send_mail_callback' );
 
   function p_proxy_callback() {
+    require_once( plugin_dir_path( __FILE__ ).'options.php' );
+    p_init_logging();
+
     if (P_DEBUG) error_log('Call to p_proxy_callback');
 
     if ($_SERVER['REQUEST_METHOD']=='GET') {
@@ -98,20 +107,25 @@
     $msg_namespace = $p_options->get_message_namespace();
     // NOTE this will be already prefixed with tenant id / msg ns by shortcode
     $msg_name = $_REQUEST['msg_name'];
-    if (!endsWith($msg_name,'.json')) {
+    if ($_REQUEST['executionId'] == null && !endsWith($msg_name,'.json')) {
       $msg_name = $msg_name.'.json';
     }
-    $url = $p_options->get_api_url().'msg/'.$p_options->get_message_namespace().'/'.$msg_name;
-    if (P_DEBUG) {
+
+    if ($_REQUEST['executionId']==null) {
+      // Url for starting a new process
+      $url = $p_options->get_api_url().'msg/'.$p_options->get_message_namespace().'/'.$msg_name;
+    } else {
+      // Url to update an existing process
+      $url = $p_options->get_api_url().$p_options->get_message_namespace().'/messages/'.$msg_name.'/'.$_REQUEST['executionId'];
+    }
+    if (P_INFO) {
       error_log('Notifying server: ');
+      error_log('  Verb: '.$_SERVER['REQUEST_METHOD']);
       error_log('  URL: '.$url);
       error_log('  Message name: '.$msg_name);
       error_log('  JSON: '.$msg);
+      error_log('  Execution id: '.$_REQUEST['executionId']);
     }
-    $fields = array(
-      $msg_field => $msg,
-      'businessDescription' => $_REQUEST['businessDescription']
-    );
     //$response = http_post_fields(P_API_URL.$msg_name, array('timeout'=>1), $fields);
 
     if ($_SERVER['REQUEST_METHOD']=='GET') {
@@ -119,20 +133,32 @@
       $url = $url.'?'.$msg_field.'='.urlencode($msg);
       if (P_DEBUG) error_log('  query string:'.$url);
       $ch = curl_init($url);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Origin: '.get_site_url() ));
+    } else if ($_REQUEST['executionId'] != null) {
+      $ch = curl_init($url);
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        'Origin: '.get_site_url(),
+        'Content-Type: application/json'
+      ));
     } else {
       $ch = curl_init($url);
       curl_setopt($ch, CURLOPT_POST, true);
+      $fields = array(
+        $msg_field => $msg,
+        'businessDescription' => $_REQUEST['businessDescription']
+      );
       curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Origin: '.get_site_url() ));
     }
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-      'Origin: '.get_site_url()
-    ));
     curl_setopt($ch, CURLOPT_USERPWD, $p_options->get_api_key().":".$p_options->get_api_secret());
 
     $response = curl_exec($ch);
     $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    if (P_DEBUG || $http_status >=300) error_log('Response from '.$url.': '.$http_status);
+
+    if (P_INFO || $http_status >=300) error_log('Response from '.$url.': '.$http_status);
     curl_close($ch);
     echo $response;
 
@@ -143,6 +169,9 @@
   add_action( 'wp_ajax_nopriv_p_proxy', 'p_proxy_callback' );
 
   function p_domain_callback() {
+    require_once( plugin_dir_path( __FILE__ ).'options.php' );
+    p_init_logging();
+
     if (P_DEBUG) error_log('Call to p_domain_callback');
     p_internal_proxy_callback('/domain/?projection=complete');
   } 
@@ -151,6 +180,9 @@
   add_action( 'wp_ajax_nopriv_p_domain', 'p_domain_callback' );
 
   function p_resource_callback() {
+    require_once( plugin_dir_path( __FILE__ ).'options.php' );
+    p_init_logging();
+
     if (P_DEBUG) error_log('Call to p_resource_callback');
     p_internal_proxy_callback($_REQUEST['resource']);
   } 
@@ -159,6 +191,9 @@
   add_action( 'wp_ajax_nopriv_p_resource', 'p_resource_callback' );
 
   function p_internal_proxy_callback( $resource ) {
+    require_once( plugin_dir_path( __FILE__ ).'options.php' );
+    p_init_logging();
+
     if (P_DEBUG) error_log('Call to p_domain_callback');
 
     if ($p_options == null) $p_options = new FormsOptions();
