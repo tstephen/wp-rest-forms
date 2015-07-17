@@ -21,7 +21,6 @@
   require_once("includes/ajax_support.php");
   require_once("includes/contacts_widget.php");
   require_once("includes/events.php");
-  require_once("includes/events_widget.php");
   require_once("includes/tasks_widget.php");
   require_once("includes/shortcodes.php");
   require_once("includes/tasks_widget.php");

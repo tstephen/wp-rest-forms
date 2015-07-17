@@ -21,6 +21,8 @@ EASING_DURATION = 1000;
 TAB = 9;
 ENTER = 13;
 REQUIRED = '<span class="mandatory">*</span>';
+BANNED_WORDS = ['cock','anal','anus','arse','ass','ballsack','balls','bastard','bitch','biatch','bloody','blowjob','blow','job','bollock','bollok','boner','boob','bugger','bum','butt','buttplug','clitoris','cock','coon','crap','cunt','damn','dick','dildo','dyke','fag','feck','fellate','fellatio','felching','fuck','f u c k','fudgepacker','fudge packer','flange','Goddamn','God','damn','hell','homo','jerk','jizz','knobend','knob end','labia','lmao','lmfao','muff','nigger','nigga','omg','penis','piss','poop','prick','pube','pussy','queer','scrotum','sex','shit','s hit','sh1t','slut','smegma','spunk','tit','tosser','turd','twat','vagina','wank','whore','wtf'];
+BANNED_WORD_MSG = 'Please do not use profanity, this site is intended for a family audience.';
 useReadyHandlers = true;
 fadeOutMessages = true;
 
@@ -652,6 +654,12 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
   }
 };
   this.sendMessageIfValid = function(formId, mep, msgName, msg, redirect, wp_callback, proxy, businessDescription) { 
+    $.each($('#'+formId+' input[type="text"],#'+formId+' textarea'), function(i,d) { 
+      if (!validateBannedWords($(d).val())) { 
+        $(d).setCustomValidity('Please re-word this for an all-age audience');
+        $p.showError(BANNED_WORD_MSG);
+      }
+    });
     validateRadio();
     if (document.getElementById(formId).checkValidity()) {
       $p.sendMessage(mep, msgName, msg, redirect, wp_callback, proxy, businessDescription);
@@ -802,3 +810,16 @@ function insertAtCursor(myField, myValue) {
 function validateRadio() { 
   $('[type="radio"]:invalid').parent().parent().find('.field-hint').removeClass('hidden').css('color','red'); 
 } 
+/**
+ * @return true if the value received is valid (i.e. does not contain banned words).
+ */
+function validateBannedWords(val) { 
+  var valid = true;
+  var words = val.split(/\W/); 
+  $.each(words, function(i,d) { 
+    $.each(BANNED_WORDS, function(j,e) { 
+      if (d==e) valid = false ; 
+    });
+  });
+  return valid;
+}
