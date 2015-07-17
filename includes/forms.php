@@ -30,7 +30,7 @@
   		'show_in_nav_menus'   => true,
   		'show_in_admin_bar'   => true,
   		'menu_position'       => 20,
-      'menu_icon'           => plugins_url('../images/omny-greyscale-inverse-icon-20x20.png', __FILE__),
+      'menu_icon'           => plugins_url('../images/omny-greyscale-icon-20x20.png', __FILE__),
   		'can_export'          => true,
   		'has_archive'         => false,
   		'exclude_from_search' => false,
