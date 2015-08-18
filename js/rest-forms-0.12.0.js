@@ -15,12 +15,14 @@
 })(this.console = this.console || {}); // Using `this` for web workers.
 
 /*
-* Copyright 2013-15 Tim Stephenson. All rights reserved.
-*/
+ * Copyright 2013-15 Tim Stephenson. All rights reserved.
+ */
 EASING_DURATION = 1000;
 TAB = 9;
 ENTER = 13;
 REQUIRED = '<span class="mandatory">*</span>';
+BANNED_WORDS = [];
+BANNED_WORD_MSG = 'Please do not use profanity, this site is intended for a family audience.';
 useReadyHandlers = true;
 fadeOutMessages = true;
 
@@ -130,7 +132,7 @@ function App() {
     $p._addControl($('#ctrlId').val(),
       ctrlType,
       $('#ctrlLabel').val(),
-      $('#ctrlPlaceholder').val().toLowerCase().replace(/ /g, '_'),
+      $('#ctrlPlaceholder').val().toLowerCase(),
       $('#ctrlRequired').prop('checked'),
       undefined,
       options);
@@ -287,7 +289,9 @@ function App() {
       this.bindControls = function() {
         console.log('bindControls');
         $('.p-form input[id]:not([data-p-bind]), .p-form select[id]:not([data-p-bind]), .p-form textarea[id]:not([data-p-bind])')
-          .attr('data-p-bind',function() { return '$p.'+$(this).closest('form')[0].id.replace(/-/g,'_')+'.'+this.id; });
+          .attr('data-p-bind',function() { 
+            return '$p.'+$(this).closest('form')[0].id.replace(/-/g,'_')+'.'+this.id; 
+          });
         $('[data-p-bind]:not([placeholder])').attr('placeholder', function() { return this.title; });
 
         // special processing to create radio / checkbox group
@@ -497,7 +501,7 @@ this.getResource = function(resource, searchExpr, callback) {
   } else {
     return $.ajax({
       type: 'GET',
-      url: $p.server+resource,
+      url: (resource.indexOf('/admin-ajax.php')==-1 ? $p.server+resource : resource),
       contentType: 'application/json',
       data: searchExpr,
       dataType: 'text',
@@ -548,6 +552,18 @@ this.hideActivityIndicator = function(msg, addClass) {
 this.isOffline = function() {
   return false;
 };
+this.nameToSlug = function(name, incHyphens) {
+  console.log('nameToSlug: '+name+', '+incHyphens);
+  if (incHyphens==undefined) incHyphens=true;
+  if (name!=undefined && isNaN(name) && incHyphens) {
+    return name.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
+  } else if (name!=undefined && isNaN(name)) {
+    return name.toLowerCase().replace(/ /g,'').replace(/[^\w-]+/g,'');
+  } else {
+    return name;
+  }
+}
+
 /**
 * @param msg JSON or object repesentation of message to send
 */
@@ -652,6 +668,12 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
   }
 };
   this.sendMessageIfValid = function(formId, mep, msgName, msg, redirect, wp_callback, proxy, businessDescription) { 
+    $.each($('#'+formId+' input[type="text"],#'+formId+' textarea'), function(i,d) { 
+      if (!validateBannedWords($(d).val())) { 
+        $(d).setCustomValidity('Please re-word this for an all-age audience');
+        $p.showError(BANNED_WORD_MSG);
+      }
+    });
     validateRadio();
     if (document.getElementById(formId).checkValidity()) {
       $p.sendMessage(mep, msgName, msg, redirect, wp_callback, proxy, businessDescription);
@@ -675,13 +697,18 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
     console.log('msg: '+ msg);
     console.log('server: '+ $p.server);
     var url = $p.server+$p.tenant+'/messages/'+msgName+'/'+execId;
-    if (proxy) url = '/wp-admin/admin-ajax.php';
+    var d = {
+      json: msg,
+      msg_name: msgName,
+      action: 'p_proxy',
+      executionId: execId
+    };
     $('html, body').css("cursor", "wait");
     return $.ajax({
       type: 'POST',
-      url: url,
-      contentType: 'application/json',
-      data: msg,
+      url: (proxy ? '/wp-admin/admin-ajax.php' : url),
+      contentType: (proxy ? 'application/x-www-form-urlencoded; charset=UTF-8' : 'application/json'),
+      data: (proxy ? d : msg),
       timeout: 30000,
       username: $p.username,
       password: $p.password,
@@ -696,6 +723,7 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
         try { $p.response = JSON.parse(response); }
         catch (e) { $p.response = response; }
         if ($p['onResponse'] != undefined) $p.onResponse(); 
+        if (wp_callback != undefined) wp_callback(); 
         $p.hideActivityIndicator();
         $p.showMessage('Your information has been received','bg-success text-success');
         if (undefined != redirect) window.location.href=redirect;
@@ -796,3 +824,16 @@ function insertAtCursor(myField, myValue) {
 function validateRadio() { 
   $('[type="radio"]:invalid').parent().parent().find('.field-hint').removeClass('hidden').css('color','red'); 
 } 
+/**
+ * @return true if the value received is valid (i.e. does not contain banned words).
+ */
+function validateBannedWords(val) { 
+  var valid = true;
+  var words = val.split(/\W/); 
+  $.each(words, function(i,d) { 
+    $.each(BANNED_WORDS, function(j,e) { 
+      if (d==e) valid = false ; 
+    });
+  });
+  return valid;
+}
