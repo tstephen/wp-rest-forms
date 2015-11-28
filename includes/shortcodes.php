@@ -7,6 +7,7 @@
       'button_text' => 'Submit',
       'callback' => null,
       'id' => '',
+      'msg_display' => 'both',
       'msg_name' => '',
       'msg_pattern' => 'none',
       'proxy' => 'false',
@@ -33,7 +34,9 @@
     $temp_content .= '</script>';
 
     $temp_content .= '<form class="p-form" id="'.$form->post_name.'">';
-    $temp_content .= '<div class="p-messages"></div>';
+    if ($a['msg_display']=='both' || $a['msg_display'=='top']) {
+      $temp_content .= '<div class="p-messages"></div>';
+    }
 
     $temp_content .= $form_content;
 
@@ -59,7 +62,9 @@ error_log('no redirect');
 error_log('with redirect');
       $a['redirect_to'] = '\''.$a['redirect_to'].'\'';
     }
-    $temp_content .= '<div class="p-messages"></div>';
+    if ($a['msg_display']=='both' || $a['msg_display'=='bottom']) {
+      $temp_content .= '<div class="p-messages"></div>';
+    }
     $temp_content .= '<button class="btn" data-p-action="$p.sendMessageIfValid(\''.$form->post_name.'\',\''.$a['msg_pattern'].'\', \''.$options->get_message_namespace().'.'.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).','.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].',\''.$a['business_description'].'\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">'.$a['button_text'].'</button>';
     $temp_content .= '</form>';
 
