@@ -4,27 +4,27 @@
  * Plugin URI: http://omny.link/solutions/omny-link-forms/
  * Description: Integrates web APIs with your WordPress app.
  * Author: Omny Link
- * Version: 0.12.0
+ * Version: 0.13.0
  * Author URI: http://omny.link
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '0.12.0');
+  define('P_VERSION', '0.13.0');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
-  require_once("includes/options.php");
+  require_once(dirname(__FILE__)."/includes/options.php");
   if ($GLOBALS['p_options'] == null) $GLOBALS['p_options'] = new FormsOptions();
   p_init_logging();
 
-  require_once("includes/ajax_support.php");
-  require_once("includes/contacts_widget.php");
-  require_once("includes/events.php");
-  require_once("includes/tasks_widget.php");
-  require_once("includes/shortcodes.php");
-  require_once("includes/tasks_widget.php");
-  require_once("includes/forms.php");
+  require_once(dirname(__FILE__)."/includes/ajax_support.php");
+  require_once(dirname(__FILE__)."/includes/contacts_widget.php");
+  require_once(dirname(__FILE__)."/includes/events.php");
+  require_once(dirname(__FILE__)."/includes/tasks_widget.php");
+  require_once(dirname(__FILE__)."/includes/shortcodes.php");
+  require_once(dirname(__FILE__)."/includes/tasks_widget.php");
+  require_once(dirname(__FILE__)."/includes/forms.php");
 
   if ( is_admin() ) {
     // admin only actions
