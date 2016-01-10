@@ -53,6 +53,7 @@
         $temp_content .= $arr[0].':"'.$arr[1].'",';
       }
     }
+    $temp_content .= 'ip:"'.$_SERVER["REMOTE_ADDR"].'",';
     $temp_content .= 'admin_email:"'.get_option( 'admin_email' ).'"};</script>';
 
     if (empty($a['redirect_to'])) { 
