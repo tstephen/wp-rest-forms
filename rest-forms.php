@@ -1,11 +1,10 @@
 <?php
 /*
  * Plugin Name: Omny Link Forms
- * Plugin URI: http://omny.link/solutions/omny-link-forms/
+ * Plugin URI: http://omny.link/omny-link-forms/
  * Description: Integrates web APIs with your WordPress app.
  * Author: Omny Link
  * Version: 0.13.0
- * Author URI: http://omny.link
  * License: GPLv2 or later
  */
 
