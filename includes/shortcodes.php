@@ -57,16 +57,19 @@
     $temp_content .= 'admin_email:"'.get_option( 'admin_email' ).'"};</script>';
 
     if (empty($a['redirect_to'])) { 
-error_log('no redirect');
+      if (P_DEBUG) error_log('no redirect');
       $a['redirect_to'] = 'undefined';
     } else { 
-error_log('with redirect');
+      if (P_DEBUG) error_log('with redirect');
       $a['redirect_to'] = '\''.$a['redirect_to'].'\'';
     }
     if ($a['msg_display']=='both' || $a['msg_display'=='bottom']) {
       $temp_content .= '<div class="p-messages"></div>';
     }
-    $temp_content .= '<button class="btn" data-p-action="$p.sendMessageIfValid(\''.$form->post_name.'\',\''.$a['msg_pattern'].'\', \''.$options->get_message_namespace().'.'.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).','.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].',\''.$a['business_description'].'\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">'.$a['button_text'].'</button>';
+    if (substr_count($a['msg_name'], '.') < 2) {
+      $a['msg_name'] = $options->get_message_namespace().'.'.$a['msg_name'];
+    }
+    $temp_content .= '<button class="btn" data-p-action="$p.sendMessageIfValid(\''.$form->post_name.'\',\''.$a['msg_pattern'].'\', \''.$a['msg_name'].'\', $p.'.str_replace('-','_',$form->post_name).','.$a['redirect_to'].',\''.$a['callback'].'\','.$a['proxy'].',\''.$a['business_description'].'\');" id="btn-'.$form->post_name.'" form="'.$form->post_name.'" type="button">'.$a['button_text'].'</button>';
     $temp_content .= '</form>';
 
     ob_end_clean();

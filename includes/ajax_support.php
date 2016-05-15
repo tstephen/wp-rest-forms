@@ -118,7 +118,7 @@
       // Url to update an existing process
       $url = $p_options->get_api_url().$p_options->get_message_namespace().'/messages/'.$msg_name.'/'.$_REQUEST['executionId'];
     }
-    if (P_INFO) {
+    if (P_DEBUG || P_INFO) {
       error_log('Notifying server: ');
       error_log('  Verb: '.$_SERVER['REQUEST_METHOD']);
       error_log('  URL: '.$url);

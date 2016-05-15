@@ -195,7 +195,7 @@ class FormsOptions {
 
         add_settings_field(
             'message_namespace', // ID
-            'Message namespace', // Label
+            'Tenant Id', // Label
             array( $this, 'p_message_namespace_callback' ), // Callback
             'p_settings_admin', // Page
             'p_setting_section_server' // Section
