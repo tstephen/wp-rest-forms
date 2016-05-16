@@ -99,6 +99,11 @@
       <input type="text" name="ctrlOptions" id="ctrlOptions" value="<?php if ( isset ( $p_stored_meta['ctrlOptions'] ) ) echo $p_stored_meta['ctrlOptions'][0]; ?>" />
     </p>
 
+    <p id="ctrlValuePara">
+      <label for="ctrlValue"><?php _e( 'Initial value', P_TEXT_DOMAIN )?></label><br/>
+      <input type="text" name="ctrlValue" id="ctrlValue" value="<?php if ( isset ( $p_stored_meta['ctrlValue'] ) ) echo $p_stored_meta['ctrlValue'][0]; ?>" />
+    </p>
+
     <p>
       <span><?php _e( 'Required?', P_TEXT_DOMAIN )?></span>
       <div class="prfx-row-content">
