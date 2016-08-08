@@ -29,7 +29,7 @@
     $temp_content .= '  webshims.setOptions("waitReady", false);';
     // No UK locale, but AU sets date format just fine!
     $temp_content .= '  webshims.activeLang("en-AU");';
-    $temp_content .= '  webshims.setOptions("forms-ext", { types: "date", "widgets": { "size": 2, "startView": 2, "openOnFocus": true } });';
+    $temp_content .= '  webshims.setOptions("forms-ext", { types: "date", "widgets": { "openOnFocus": true, "startView": 0 } });';
     $temp_content .= '  webshims.polyfill("forms forms-ext");';
     $temp_content .= '</script>';
 
