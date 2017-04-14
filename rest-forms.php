@@ -4,12 +4,12 @@
  * Plugin URI: http://omny.link/omny-link-forms/
  * Description: Integrates web APIs with your WordPress app.
  * Author: Omny Link
- * Version: 1.0.0 alpha 1
+ * Version: 1.0.0 alpha 2
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '1.0.0-a1');
+  define('P_VERSION', '1.0.0-a2');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
@@ -86,14 +86,14 @@
     } else {
       wp_enqueue_script(
         'webshim-modernizr',
-        'http://cdn.jsdelivr.net/webshim/1.12.4/extras/modernizr-custom.js',
+        '//cdn.jsdelivr.net/webshim/1.12.4/extras/modernizr-custom.js',
         array( 'jquery' ),
         null, /* Force no version as query string */
         false /* Force load in header */
       );
       wp_enqueue_script(
         'webshim',
-        'http://cdn.jsdelivr.net/webshim/1.12.4/polyfiller.js',
+        '//cdn.jsdelivr.net/webshim/1.12.4/polyfiller.js',
         array( 'jquery' ),
         null, /* Force no version as query string */
         false /* Force load in header */
