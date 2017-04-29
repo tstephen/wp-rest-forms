@@ -99,10 +99,11 @@
 
   <target name="package" depends="compile">
     <zip destfile="${dist}/${zipName}"
-         basedir="${src}"
          excludes=".svn/**/*, jasmine*, **/*~, **/*.log, **/*.swp, **/*.xcf"
          update="true"
-    />
+    >
+      <zipfileset dir="${src}" prefix="rest-forms"/>
+    </zip>
   </target>
 
 </project>
