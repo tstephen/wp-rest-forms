@@ -3,13 +3,13 @@
  * Plugin Name: Omny Link Forms
  * Plugin URI: http://omny.link/omny-link-forms/
  * Description: Integrates web APIs with your WordPress app.
- * Author: Omny Link
- * Version: 1.0.0 alpha 1
+ * Author: Copyright 2013-17 Tim Stephenson.
+ * Version: 1.0.0 alpha3 
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '1.0.0-a1');
+  define('P_VERSION', '1.0.0-a3');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
@@ -42,7 +42,7 @@
         $p.server='<?php echo $p_options->get_api_url(); ?>';
         $p.tenant='<?php echo $p_options->get_message_namespace(); ?>';
         $p.proxyApi = '<?php echo $p_options->is_proxy_required() ?>'==1 ? true : false;
-        $.ajaxSetup({xhrFields: {withCredentials: true}});
+        jQuery.ajaxSetup({xhrFields: {withCredentials: true}});
       });</script>
     <?php
     }
@@ -55,7 +55,7 @@
     } else {
       wp_enqueue_style(
         P_ID.'-frontend',
-        plugins_url( 'css/frontend-'.P_VERSION.'.css', __FILE__ ),
+        plugins_url( P_VERSION.'/css/frontend.css', __FILE__ ),
         array(),
         null /* Force no version as query string */
       );
@@ -67,47 +67,53 @@
     // used for both admin and front end
 
     wp_enqueue_script(
-      P_ID.'-client',
-      plugins_url( 'js/'.P_ID.'-'.P_VERSION.(P_DEBUG ? '' : '.min').'.js', __FILE__ ),
-      array( 'jquery', 'jquery-ui-autocomplete' ),
-      null, /* Force no version as query string */
-      true /* Force load in footer */
-    );
-    wp_enqueue_script(
       'i18n',
-      plugins_url( 'js/i18n.js', __FILE__ ),
+      plugins_url( P_VERSION.'/js/i18n.js', __FILE__ ),
       array(),
       null, /* Force no version as query string */
       true /* Force load in footer */
     );
 
     if ( is_admin() ) {
-      ;
+      wp_enqueue_script(
+        P_ID.'-admin',
+        plugins_url( P_VERSION.'/js/admin'.(P_DEBUG ? '' : '.min').'.js', __FILE__ ),
+        array( 'jquery', 'jquery-ui-autocomplete' ),
+        null, /* Force no version as query string */
+        true /* Force load in footer */
+      );
     } else {
       wp_enqueue_script(
+        P_ID.'-client',
+        plugins_url( P_VERSION.'/js/frontend'.(P_DEBUG ? '' : '.min').'.js', __FILE__ ),
+        array( 'jquery', 'jquery-ui-autocomplete' ),
+        null, /* Force no version as query string */
+        true /* Force load in footer */
+      );
+      wp_enqueue_script(
         'webshim-modernizr',
-        'http://cdn.jsdelivr.net/webshim/1.12.4/extras/modernizr-custom.js',
+        '//cdn.jsdelivr.net/webshim/1.12.4/extras/modernizr-custom.js',
         array( 'jquery' ),
         null, /* Force no version as query string */
         false /* Force load in header */
       );
       wp_enqueue_script(
         'webshim',
-        'http://cdn.jsdelivr.net/webshim/1.12.4/polyfiller.js',
+        '//cdn.jsdelivr.net/webshim/1.12.4/polyfiller.js',
         array( 'jquery' ),
         null, /* Force no version as query string */
         false /* Force load in header */
       );
       wp_enqueue_script(
         'moustache.js',
-        plugins_url( 'js/moustache.js', __FILE__ ),
+        plugins_url( P_VERSION.'/js/moustache.js', __FILE__ ),
         array(),
         null, /* Force no version as query string */
         true /* Force load in footer */
       );
       wp_enqueue_script(
         'autoNumeric',
-        plugins_url( 'js/autoNumeric'.(P_DEBUG ? '' : '.min').'.js', __FILE__ ),
+        plugins_url( P_VERSION.'/js/autoNumeric'.(P_DEBUG ? '' : '.min').'.js', __FILE__ ),
         array(),
         null, /* Force no version as query string */
         true /* Force load in footer */

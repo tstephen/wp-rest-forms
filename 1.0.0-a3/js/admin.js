@@ -15,21 +15,8 @@
 })(this.console = this.console || {}); // Using `this` for web workers.
 
 /*
- * Copyright 2013-15 Tim Stephenson. All rights reserved.
+ * Copyright 2013-17 Tim Stephenson. All rights reserved.
  */
-EASING_DURATION = 1000;
-TAB = 9;
-ENTER = 13;
-REQUIRED = '<span class="mandatory">*</span>';
-BANNED_WORDS = [];
-BANNED_WORD_MSG = 'Please do not use profanity, this site is intended for a family audience.';
-useReadyHandlers = true;
-fadeOutMessages = true;
-
-if ($ == undefined && jQuery != undefined) {
-  console.log('aliasing jQuery to $');
-  $ = jQuery;
-}
 $.fn.moustache = function(data) {
   //console.info('invoking moustache template with data: '+JSON.stringify(data));
   var output = Mustache.render($(this).html(),data);
@@ -37,17 +24,34 @@ $.fn.moustache = function(data) {
   this.empty().append(output);
 };
 
-$(document).ready(function() {
-  console.info('Ready event fired, binding actions to data-p attributes...');
-  $p.init();
-});
+var $p = (function ($) {
+  EASING_DURATION = 1000;
+  TAB = 9;
+  ENTER = 13;
+  REQUIRED = '<span class="mandatory">*</span>';
+  BANNED_WORDS = [];
+  BANNED_WORD_MSG = 'Please do not use profanity, this site is intended for a family audience.';
+  useReadyHandlers = true;
+  fadeOutMessages = true;
 
-var $p = new App();
-function App() {
+  function validateRadio() {
+    $('[type="radio"]:invalid').parent().parent().find('.field-hint').removeClass('hidden').css('color','red');
+  }
+  /**
+   * @return true if the value received is valid (i.e. does not contain banned words).
+   */
+  function validateBannedWords(val) {
+    var valid = true;
+    var words = val.split(/\W/);
+    $.each(words, function(i,d) {
+      $.each(BANNED_WORDS, function(j,e) {
+        if (d==e) valid = false ;
+      });
+    });
+  }
+
   this.enhanceForms=true;
-  //this.server = 'https://api.knowprocess.com';
   this.server = '';
-  //this.server = 'http://localhost:9090';
   this.onInitCallbacks = $.Callbacks();
   this.init = function() {
     $p.l10n = new I18nController();
@@ -66,9 +70,9 @@ function App() {
   this.ensureInited = function(d) {
     if (d == undefined) d = {};
   };
-  this.fetchAndRender = function(url,varName,templateSelector,containerSelector) { 
+  this.fetchAndRender = function(url,varName,templateSelector,containerSelector) {
     console.log('fetchAndRender');
-    $p.getResource(url,undefined,function(response) { 
+    $p.getResource(url,undefined,function(response) {
       console.log('...'+response);
         $.each(response,function(i,d) {
           d.age = $p.l10n.getAgeString(new Date(d.lastUpdated));
@@ -91,8 +95,7 @@ function App() {
       if (ref.length >0) ref+='.';
       ref+=(parts[idx]);
       //console.log('Needs initialising? '+ref);
-      var obj = eval(ref);
-      if (obj == undefined && idx<(parts.length-1)) {
+      if (parseInt(idx)<(parts.length-1) && eval(ref) == undefined) {
         console.log('Initialising '+ref);
         eval(ref+' = new Object();');
       }
@@ -171,18 +174,18 @@ function App() {
       }
   };
   this.addControlOptions = function() {
-    switch ($('#ctrlType').val()) { 
+    switch ($('#ctrlType').val()) {
     case 'checkbox':
-    case 'radio': 
+    case 'radio':
     case 'select':
-      $('#ctrlOptionsPara').show(); 
+      $('#ctrlOptionsPara').show();
       break;
-    default: 
-      $('#ctrlOptionsPara').hide(); 
+    default:
+      $('#ctrlOptionsPara').hide();
       break;
     }
   };
-    this.addDomainControl = function() {
+  this.addDomainControl = function() {
       var domainCtrl = $('#domainCtrl').val();
       console.log('addDomainControl: '+domainCtrl);
       var entity = domainCtrl.substring(0,domainCtrl.indexOf('.'));
@@ -199,8 +202,8 @@ function App() {
           });
         }
       });
-    };
-      this.bind = function() {
+  };
+  this.bind = function() {
         $('[data-p-init]').each(function(i,d) {
           eval($(d).data('p-init')+'=new Object();');
         });
@@ -211,16 +214,16 @@ function App() {
         $p.bindCombos();
         $p.bindTables();
         $p.bindSectionsToNav();
-      };
-      this.bindReadyHandlers = function() {
+  };
+  this.bindReadyHandlers = function() {
         console.info('bindReadyHandlers');
         $('[data-p-ready]').each(function(i,d) {
           var f = $(d).attr('data-p-ready');
           console.info('  '+f);
           eval(f);
         });
-      };
-      this.bindActionHandlers = function() {
+  };
+  this.bindActionHandlers = function() {
         $('[data-p-action]').click(function(ev) {
           var action = $(ev.target).data('p-action');
           if (action.indexOf('(') != -1) {
@@ -235,8 +238,8 @@ function App() {
             ev.preventDefault();
           }
         });
-      };
-      this.bindCombos = function() {
+  };
+  this.bindCombos = function() {
         console.log('bind combos');
         $('[data-p-combo]').each(function(i,d) {
           var val = $(d).data('p-combo');
@@ -285,12 +288,12 @@ function App() {
             $('#'+ev.target.id).autocomplete('search');
           });
         });
-      };
-      this.bindControls = function() {
+  };
+  this.bindControls = function() {
         console.log('bindControls');
         $('.p-form input[id]:not([data-p-bind]), .p-form select[id]:not([data-p-bind]), .p-form textarea[id]:not([data-p-bind])')
-          .attr('data-p-bind',function() { 
-            return '$p.'+$(this).closest('form')[0].id.replace(/-/g,'_')+'.'+this.id; 
+          .attr('data-p-bind',function() {
+            return '$p.'+$(this).closest('form')[0].id.replace(/-/g,'_')+'.'+this.id;
           });
         $('[data-p-bind]:not([placeholder])').attr('placeholder', function() { return this.title; });
 
@@ -299,14 +302,17 @@ function App() {
         //console.log('Have radios: '+radioCtrls);
         $.each(radioCtrls, function(i,d) {
           console.log('Have '+d.type);
-          ctrl = '<div class="form-group">';
+          ctrl = '<div class="form-group" data-p-bind="$p.';
+          ctrl += $(d).closest('form')[0].id.replace(/-/g,'_')+'.'+d.id;
+          ctrl += '">';
           ctrl += '<label for="'+d.id+'">'+d.name+(d.required ? REQUIRED : '')+'</label><br/>';
           var options = $(d).data('options') == undefined ? [] : $(d).data('options').split(',');
-          $.each(options, function(j,e) { 
+          $.each(options, function(j,e) {
             console.log('  option: '+e);
-            ctrl += '<span class="'+d.type+'-inline"><input class="decorate" id="'
-            +'" on-blur="validateRadio()" name="'+d.id
-            +'" '+(d.required?'required ':'')+' type="'+d.type+'">'+e+'</span>'
+            ctrl += '<span class="'+d.type+'-inline"><input class="decorate" '
+            +'" onchange="validateRadio();$p.syncToModel(event)"'
+            +' name="'+d.id
+            +'" '+(d.required?'required ':'')+' type="'+d.type+'" value="'+e+'">'+e+'</span>'
           });
           ctrl += '<br/><span class="field-hint hidden">Please select one of the options above.</span>';
           ctrl += '</div>';
@@ -320,14 +326,14 @@ function App() {
           console.log('Have '+d.type);
           var options = $(d).data('options') == undefined ? [] : $(d).data('options').split(',');
           if (!$(d).prop('required')) $(d).append('<option id="">Please Select</option>');
-          $.each(options, function(j,e) { 
+          $.each(options, function(j,e) {
             console.log('  option: '+e);
             $(d).append('<option id="'+e+'">'+e+'</option>');
           });
         });
 
-        // decorate all other controls  
-        $('[data-p-bind].decorate')
+        // decorate all other controls
+        $('[data-p-bind].decorate[type!="radio"],[data-p-bind].decorate[type!="checkbox"]')
         .addClass('form-control')
         .wrap('<div class="form-group">')
         .before(function(i) {
@@ -341,13 +347,15 @@ function App() {
           .addClass('form-control')
           .removeClass('decorate')
           .wrap('<div class="form-group">');
+
+        // bind data sync
         $('[data-p-bind]').each(function(i,d) {
           // check we do not have moustache template
           if ($(d).data('p-bind').indexOf('{')==-1) {
             console.info('binding control '+d.name+' to '+$(d).data('p-bind'));
             $p.initObj($(d), 'p-bind');
             if ($(d).data('p-type')=='number') $(d).autoNumeric('init', {mDec:0});
-            var val = eval($(d).data('p-bind'));
+            //var val = eval($(d).data('p-bind'));
             $(d).on('blur', $p.syncToModel);
             $(d).on('change', $p.syncToModel);
           } else {
@@ -357,8 +365,8 @@ function App() {
         $('[data-p-display]').each(function(i,d) {
           if ($(d).data('p-type')=='number') $(d).autoNumeric('init', {mDec:0});
         });
-      };
-      this.bindSectionsToNav = function() {
+  };
+  this.bindSectionsToNav = function() {
               $('[data-p-section]').each(function(i,d) {
                 console.log('bind nav handler to '+$(d).data('p-section'));
                 $(d).on('click',function() {
@@ -371,286 +379,284 @@ function App() {
                   $('#'+sect).delay(500).removeClass('hide').fadeIn(500);
                 });
               });
-            };
-            this.bindTables = function() {
-              $('[data-p-table]').each(function(i,d) {
-                var entity = $(d).data('p-table');
-                console.info('Binding data from "'+entity+'" to: "'+d.id+'"');
-                console.info('Col Names are: '+$(d).data('p-table-colnames'));
-                var colNames = $(d).data('p-table-colnames').split(',');
-                var cols = [
-              { data: "name" },
-            { data: "childrenStartYears", validator: this.csNumericValidator },
-          { data: "email", validator: this.emailValidator, allowInvalid: false },
+  };
+  this.bindTables = function() {
+    $('[data-p-table]').each(function(i,d) {
+      var entity = $(d).data('p-table');
+      console.info('Binding data from "'+entity+'" to: "'+d.id+'"');
+      console.info('Col Names are: '+$(d).data('p-table-colnames'));
+      var colNames = $(d).data('p-table-colnames').split(',');
+      var cols = [
+        { data: "name" },
+        { data: "childrenStartYears", validator: this.csNumericValidator },
+        { data: "email", validator: this.emailValidator, allowInvalid: false },
         { data: "phone" },
-      {
-        data: "mailingLists",
-        /* autocomplete only supports single select
-        * type: "autocomplete",
-        source: ["Committee", "Meetings", "Volunteers", ""], //empty string is a valid value
-        strict: true*/
-      },
-    { data: "crb", type: "checkbox", allowInvalid:true  },
-  { data: "firstAid", type: "checkbox" }
-  ];
-  console.info('colNames found: '+colNames);
-  var hot = $(d).handsontable({
-    startRows: 1,
-    startCols: colNames.length,
-    rowHeaders: true,
-    colHeaders: colNames,
-    minSpareRows: 1,
-    contextMenu: false,
-    columns: cols,
-    columnSorting: true,
-    /* This works but is very verbose. would prefer placeholder
-    * consider custom renderer: http://handsontable.com/demo/renderers_html.html
-    * or http://handsontable.com/demo/prepopulate.html
-    dataSchema: { name: "",
-    childrenStartYears: "",
-    email: "",
-    phone: "",
-    mailingLists: "",
-    crb: false,
-    firstAid: false
-  },*/
-  removeRowPlugin: true,
-  afterChange: function (change, source) {
-    if (source === 'loadData') {
-      return; //don't save this change
-    } else if (source === 'edit') {
-      console.log('type change:'+typeof change);
-      console.log('json change:'+JSON.stringify(change));
-      window.change = change;
-      row = change[0][0];
-      col = change[0][1];
-      from = change[0][2];
-      to = change[0][3];
-      console.log('my change:'+row+','+col+' from '+from+' to '+to);
+        {
+          data: "mailingLists",
+          /* autocomplete only supports single select
+          * type: "autocomplete",
+          source: ["Committee", "Meetings", "Volunteers", ""], //empty string is a valid value
+          strict: true*/
+        },
+        { data: "crb", type: "checkbox", allowInvalid:true  },
+        { data: "firstAid", type: "checkbox" }
+      ];
+    console.info('colNames found: '+colNames);
+    var hot = $(d).handsontable({
+      startRows: 1,
+      startCols: colNames.length,
+      rowHeaders: true,
+      colHeaders: colNames,
+      minSpareRows: 1,
+      contextMenu: false,
+      columns: cols,
+      columnSorting: true,
+      /* This works but is very verbose. would prefer placeholder
+      * consider custom renderer: http://handsontable.com/demo/renderers_html.html
+      * or http://handsontable.com/demo/prepopulate.html
+      dataSchema: { name: "",
+      childrenStartYears: "",
+      email: "",
+      phone: "",
+      mailingLists: "",
+      crb: false,
+      firstAid: false
+      },*/
+      removeRowPlugin: true,
+      afterChange: function (change, source) {
+        if (source === 'loadData') {
+          return; //don't save this change
+        } else if (source === 'edit') {
+          console.log('type change:'+typeof change);
+          console.log('json change:'+JSON.stringify(change));
+          window.change = change;
+          row = change[0][0];
+          col = change[0][1];
+          from = change[0][2];
+          to = change[0][3];
+          console.log('my change:'+row+','+col+' from '+from+' to '+to);
 
-      if (row>=pta.data.length) { // create
-        console.log('create new record');
-        var p = new Person();
-        pta.data.push(p);
-        pta.set(row,col,to);
-      } else { // update
-        console.log('TODO update record: '+row);
-        //pta.data.splice(row,1);
-        //var p = pta.data[row];
-        // LAST USED pta.set(row,col,to);
-        //          pta.data.push(p);
-      }
-      //pta.save();
-    } else {
-      console.log('type change:'+typeof change);
-      console.log(' source:'+source);
-    }
-    console.log('Autosaved (' + change.length + ' cell' + (change.length > 1 ? 's' : '') + ')');
-    console.log('... source: '+source+', change:'+change);
-    //          pta.data.push(new Person(change.splice(0,1)));
-  },
-  afterRemoveRow: function(idx, amount) {
-    console.log('removed row: '+idx+','+amount);
-    //          pta.data.splice(idx, amount);
-    //pta.save();
-  }
-});
-$('html, body').css("cursor", "wait");
-return $.ajax({
-  type: 'GET',
-  url: $p.server+'/'+entity,
-  contentType: 'application/json',
-  dataType: 'json',
-  success: function(response) {
-    console.log('success fetching data');
-    //localStorage['GET_repository_definitions']=response;
-    hot.loadData(response);
-    $('html, body').css("cursor", "auto");
-  },
-  error: function(jqXHR, textStatus, errorThrown) {
-    console.log('error:'+textStatus+':'+errorThrown);
-    console.log('  headers: '+JSON.stringify(jqXHR.getAllResponseHeaders()));
-    $('html, body').css("cursor", "auto");
-  }
-});
-});
-};
-this.getResource = function(resource, searchExpr, callback) {
-  console.log('get resource "'+resource+'", filtered by: '+JSON.stringify(searchExpr));
-  if ($p.isOffline()) {
-    callback(JSON.parse(localStorage['GET_'+resource]));
-  } else {
-    return $.ajax({
-      type: 'GET',
-      url: (resource.indexOf('/admin-ajax.php')==-1 ? $p.server+resource : resource),
-      contentType: 'application/json',
-      data: searchExpr,
-      dataType: 'text',
-      username: $p.username,
-      password: $p.password,
-      xhrFields: { withCredentials: true },
-      done: function() {
-        console.info('Received reply');
+          if (row>=pta.data.length) { // create
+            console.log('create new record');
+            var p = new Person();
+            pta.data.push(p);
+            pta.set(row,col,to);
+          } else { // update
+            console.log('TODO update record: '+row);
+            //pta.data.splice(row,1);
+            //var p = pta.data[row];
+            // LAST USED pta.set(row,col,to);
+            //          pta.data.push(p);
+          }
+          //pta.save();
+        } else {
+          console.log('type change:'+typeof change);
+          console.log(' source:'+source);
+        }
+        console.log('Autosaved (' + change.length + ' cell' + (change.length > 1 ? 's' : '') + ')');
+        console.log('... source: '+source+', change:'+change);
+        //          pta.data.push(new Person(change.splice(0,1)));
       },
-      success: function(response) {
-        console.info('Received reply');
-        localStorage['GET_'+resource]=response;
-        callback(JSON.parse(response));
-      },
-      error: function(jqXHR, textStatus, errorThrown) {
-        console.log('ERROR '+ jqXHR.statusCode());
-        console.log('error:'+textStatus+':'+errorThrown);
+      afterRemoveRow: function(idx, amount) {
+        console.log('removed row: '+idx+','+amount);
+        //          pta.data.splice(idx, amount);
+        //pta.save();
       }
     });
-  }
-};
-this.handleCallback = function(msg, wp_callback) {
-  console.log('handleCallback: '+msg+', '+wp_callback);
-  if (window['$params'] != undefined) jQuery.extend(msg, $params);
-  if (wp_callback == undefined || wp_callback == '') {
-    console.warn('No callback to execute');
-  } else {
-    var data = {
-	  	'action': wp_callback,
-		  'json': (msg!=undefined && typeof msg == 'object')
-         ? encodeURIComponent(JSON.stringify(msg))
-         : msg
-	  };
-	  $.post('/wp-admin/admin-ajax.php', data, function(response) {
-		  console.log('Got this from the server: ' + response);
-	  });
-  }
-};
-this.hideActivityIndicator = function(msg, addClass) {
-  if (msg === undefined) msg = '';
-  $('.p-messages').empty().append(msg).removeClass('blink');
-  document.body.style.cursor='auto';
-  // enable to allow messages to fade away
-  if (fadeOutMessages && addClass!='error') setTimeout(function() {
-    $('.p-messages').fadeOut();
-  }, EASING_DURATION*10);
-};
-this.isOffline = function() {
-  return false;
-};
-this.nameToSlug = function(name, incHyphens) {
-  console.log('nameToSlug: '+name+', '+incHyphens);
-  if (incHyphens==undefined) incHyphens=true;
-  if (name!=undefined && isNaN(name) && incHyphens) {
-    return name.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
-  } else if (name!=undefined && isNaN(name)) {
-    return name.toLowerCase().replace(/ /g,'').replace(/[^\w-]+/g,'');
-  } else {
-    return name;
-  }
-}
-
-/**
-* @param msg JSON or object repesentation of message to send
-*/
-this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, businessDescription) {
-  console.log('sendMessage');
-	if (wp_callback != null && wp_callback.length > 0) $p.handleCallback(msg, wp_callback);
-
-  if (mep=='none') {
-    console.log('Server integration turned off');
-    $p.handleCallback(msg, 'p_send_mail');
-    if (undefined != redirect) window.location.href=redirect;
-  } else {
-    jQuery('html, body').css("cursor", "wait");
-    console.log('Sending '+msgName+' as mep: '+mep);
-    var type = ((mep == 'inOut' || mep == 'outOnly') ? 'GET' : 'POST');
-    switch (type) {
-    case 'GET':
-      $p.showMessage('Loading...','bg-info text-info');
-      break;
-    default:
-      $p.showMessage('Saving...','bg-info text-info');
-    }
-    msg.tenantId = $p.tenant;
-    // TODO
-    if (msg.accountInfo != undefined) msg.accountInfo.tenantId = 'firmgains';
-    if (msg.account != undefined) msg.account.tenantId = 'firmgains';
-    console.log('msg: '+ msg);
-    if (msg!=undefined && typeof msg == 'string' && msg.indexOf('{')==0) msg = JSON.parse(msg);
-    if (window['$params'] != undefined) jQuery.extend(msg, $params);
-    $p.json = msg;
-    var d = {};
-    if (msg['firstName']!=undefined && msg['lastName']!=undefined) d.businessDescription = msg.firstName+' '+msg.lastName;
-    if (msg['fullName']!=undefined) d.businessDescription = msg.fullName;
-    if (businessDescription!=undefined && businessDescription.length>0) d.businessDescription = msg[businessDescription];
-    // this strips non-significant white space
-    if (msg!=undefined && typeof msg == 'object') msg = JSON.stringify(msg);
-    console.log('msg: '+ msg);
-    mep == 'inOut' ? d.query=msg : d.json=msg;
-    d.msg_name = msgName;
-    d.action='p_proxy';
-    console.log('server: '+ $p.server);
-    console.log('d: '+ d);
-    var url = $p.server+'msg/'+$p.tenant+'/'+msgName;
-    if (proxy) url = '/wp-admin/admin-ajax.php';
     $('html, body').css("cursor", "wait");
     return $.ajax({
-      type: type,
-      url: url,
-      /* Uncomment to send as single JSON blob instead of form params
-      contentType: 'application/json',*/
-      crossDomain: true,
-      data: d,
-      dataType: 'text',
-      timeout: 30000,
-      username: $p.k,
-      password: $p.v,
-      headers: {
-        "Authorization": "Basic " + btoa($p.k + ":" + $p.v)
-      },
-      xhrFields: {withCredentials: true},
-      success: function(response, textStatus, jqxhr) {
-        console.log('successfully start instance by msg: '+jqxhr.getResponseHeader('Location'));
-        console.log('  headers: '+JSON.stringify(jqxhr.getAllResponseHeaders()));
-        console.log('  response: '+response);
-        try { $p.response = JSON.parse(response); }
-        catch (e) { $p.response = response; }
-        if ($p['onResponse'] != undefined) $p.onResponse(); 
-        $p.hideActivityIndicator();
-        switch (type) {
-        case 'GET':
-          //$p.showMessage('Loaded successfully...','bg-success text-success');
-          break;
-        default:
-          $p.showMessage('Your information has been received','bg-success text-success');
-        }
-        if (undefined != redirect) window.location.href=redirect;
+      type: 'GET',
+      url: $p.server+'/'+entity,
+      contentType: 'application/json',
+      dataType: 'json',
+      success: function(response) {
+        console.log('success fetching data');
+        //localStorage['GET_repository_definitions']=response;
+        hot.loadData(response);
+        $('html, body').css("cursor", "auto");
       },
       error: function(jqXHR, textStatus, errorThrown) {
-        var msg = 'Error saving: '+textStatus+' '+errorThrown;
-        $p.err = jqXHR;
-        switch (jqXHR.status) {
-        case 404:
-          msg = "There is no workflow deployed to handle '"+msgName+"' messages. Please contact your administrator.";
-        }
-        console.error(msg);
-        $p.hideActivityIndicator(msg, 'error');
-        switch (type) {
-        case 'GET':
-          $p.showMessage('Unable to load your data right now, please reload in a moment...','bg-danger text-danger');
-          break;
-        default:
-          $p.showMessage('Unable to save your data right now, please retry in a moment...','bg-danger text-danger');
-        }
-      },
-      complete: function(data, textStatus, jqxhr) {
-        //console.log('successfully start instance by msg: '+jqxhr.getResponseHeader('Location'));
-        //console.log('complete:'+textStatus+' data: '+JSON.stringify(data)+' jqxhr'+jqxhr);
-        if($p['msgCallbacks'] != undefined) $p.msgCallbacks.fire();
-        jQuery('html, body').css("cursor", "auto");
+        console.log('error:'+textStatus+':'+errorThrown);
+        console.log('  headers: '+JSON.stringify(jqXHR.getAllResponseHeaders()));
+        $('html, body').css("cursor", "auto");
       }
     });
+    });
+  };
+  this.getResource = function(resource, searchExpr, callback) {
+    console.log('get resource "'+resource+'", filtered by: '+JSON.stringify(searchExpr));
+    if ($p.isOffline()) {
+      callback(JSON.parse(localStorage['GET_'+resource]));
+    } else {
+      return $.ajax({
+        type: 'GET',
+        url: (resource.indexOf('/admin-ajax.php')==-1 ? $p.server+resource : resource),
+        contentType: 'application/json',
+        data: searchExpr,
+        dataType: 'text',
+        username: $p.username,
+        password: $p.password,
+        xhrFields: { withCredentials: true },
+        done: function() {
+          console.info('Received reply');
+        },
+        success: function(response) {
+          console.info('Received reply');
+          localStorage['GET_'+resource]=response;
+          callback(JSON.parse(response));
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          console.log('ERROR '+ jqXHR.statusCode());
+          console.log('error:'+textStatus+':'+errorThrown);
+        }
+      });
+    }
+  };
+  this.handleCallback = function(msg, wp_callback) {
+    console.log('handleCallback: '+msg+', '+wp_callback);
+    if (window['$params'] != undefined) jQuery.extend(msg, $params);
+    if (wp_callback == undefined || wp_callback == '') {
+      console.warn('No callback to execute');
+    } else {
+      var data = {
+  	  	'action': wp_callback,
+  		  'json': (msg!=undefined && typeof msg == 'object')
+           ? encodeURIComponent(JSON.stringify(msg))
+           : msg
+  	  };
+  	  $.post('/wp-admin/admin-ajax.php', data, function(response) {
+  		  console.log('Got this from the server: ' + response);
+  	  });
+    }
+  };
+  this.hideActivityIndicator = function(msg, addClass) {
+    if (msg === undefined) msg = '';
+    $('.p-messages').empty().append(msg).removeClass('blink');
+    document.body.style.cursor='auto';
+    // enable to allow messages to fade away
+    if (fadeOutMessages && addClass!='error') setTimeout(function() {
+      $('.p-messages').fadeOut();
+    }, EASING_DURATION*10);
+  };
+  this.isOffline = function() {
+    return false;
+  };
+  this.nameToSlug = function(name, incHyphens) {
+    console.log('nameToSlug: '+name+', '+incHyphens);
+    if (incHyphens==undefined) incHyphens=true;
+    if (name!=undefined && isNaN(name) && incHyphens) {
+      return name.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
+    } else if (name!=undefined && isNaN(name)) {
+      return name.toLowerCase().replace(/ /g,'').replace(/[^\w-]+/g,'');
+    } else {
+      return name;
+    }
   }
-};
-  this.sendMessageIfValid = function(formId, mep, msgName, msg, redirect, wp_callback, proxy, businessDescription) { 
-    $.each($('#'+formId+' input[type="text"],#'+formId+' textarea'), function(i,d) { 
-      if (!validateBannedWords($(d).val())) { 
+
+  /**
+  * @param msg JSON or object repesentation of message to send
+  */
+  this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, businessDescription) {
+    console.log('sendMessage');
+  	if (wp_callback != null && wp_callback.length > 0) $p.handleCallback(msg, wp_callback);
+
+    if (mep=='none') {
+      console.log('Server integration turned off');
+      $p.handleCallback(msg, 'p_send_mail');
+      if (undefined != redirect) window.location.href=redirect;
+    } else {
+      jQuery('html, body').css("cursor", "wait");
+      console.log('Sending '+msgName+' as mep: '+mep);
+      var type = ((mep == 'inOut' || mep == 'outOnly') ? 'GET' : 'POST');
+      switch (type) {
+      case 'GET':
+        $p.showMessage('Loading...','bg-info text-info');
+        break;
+      default:
+        $p.showMessage('Saving...','bg-info text-info');
+      }
+      msg.tenantId = $p.tenant;
+      console.log('msg: '+ msg);
+      if (msg!=undefined && typeof msg == 'string' && msg.indexOf('{')==0) msg = JSON.parse(msg);
+      if (window['$params'] != undefined) jQuery.extend(msg, $params);
+      $p.json = msg;
+      var d = {};
+      if (msg['firstName']!=undefined && msg['lastName']!=undefined) d.businessDescription = msg.firstName+' '+msg.lastName;
+      if (msg['fullName']!=undefined) d.businessDescription = msg.fullName;
+      if (businessDescription!=undefined && businessDescription.length>0) d.businessDescription = msg[businessDescription];
+      // this strips non-significant white space
+      if (msg!=undefined && typeof msg == 'object') msg = JSON.stringify(msg);
+      console.log('msg: '+ msg);
+      mep == 'inOut' ? d.query=msg : d.json=msg;
+      d.msg_name = msgName;
+      d.action='p_proxy';
+      console.log('server: '+ $p.server);
+      console.log('d: '+ d);
+      var url = $p.server+'msg/'+$p.tenant+'/'+msgName;
+      if (proxy) url = '/wp-admin/admin-ajax.php';
+      $('html, body').css("cursor", "wait");
+      return $.ajax({
+        type: type,
+        url: url,
+        /* Uncomment to send as single JSON blob instead of form params
+        contentType: 'application/json',*/
+        crossDomain: true,
+        data: d,
+        dataType: 'text',
+        timeout: 30000,
+        username: $p.k,
+        password: $p.v,
+        headers: {
+          "Authorization": "Basic " + btoa($p.k + ":" + $p.v)
+        },
+        xhrFields: {withCredentials: true},
+        success: function(response, textStatus, jqxhr) {
+          console.log('successfully start instance by msg: '+jqxhr.getResponseHeader('Location'));
+          console.log('  headers: '+JSON.stringify(jqxhr.getAllResponseHeaders()));
+          console.log('  response: '+response);
+          try { $p.response = JSON.parse(response); }
+          catch (e) { $p.response = response; }
+          if ($p['onResponse'] != undefined) $p.onResponse();
+          $p.hideActivityIndicator();
+          switch (type) {
+          case 'GET':
+            //$p.showMessage('Loaded successfully...','bg-success text-success');
+            break;
+          default:
+            $p.showMessage('Your information has been received','bg-success text-success');
+          }
+          if (undefined != redirect) window.location.href=redirect;
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          var msg = 'Error saving: '+textStatus+' '+errorThrown;
+          $p.err = jqXHR;
+          switch (jqXHR.status) {
+          case 404:
+            msg = "There is no workflow deployed to handle '"+msgName+"' messages. Please contact your administrator.";
+          }
+          console.error(msg);
+          $p.hideActivityIndicator(msg, 'error');
+          switch (type) {
+          case 'GET':
+            $p.showMessage('Unable to load your data right now, please reload in a moment...','bg-danger text-danger');
+            break;
+          default:
+            $p.showMessage('Unable to save your data right now, please retry in a moment...','bg-danger text-danger');
+          }
+        },
+        complete: function(data, textStatus, jqxhr) {
+          //console.log('successfully start instance by msg: '+jqxhr.getResponseHeader('Location'));
+          //console.log('complete:'+textStatus+' data: '+JSON.stringify(data)+' jqxhr'+jqxhr);
+          if($p['msgCallbacks'] != undefined) $p.msgCallbacks.fire();
+          jQuery('html, body').css("cursor", "auto");
+        }
+      });
+    }
+  };
+  this.sendMessageIfValid = function(formId, mep, msgName, msg, redirect, wp_callback, proxy, businessDescription) {
+    $.each($('#'+formId+' input[type="text"],#'+formId+' textarea'), function(i,d) {
+      $(d).blur(); // force sync in case browser storing values not synced
+      if (!validateBannedWords($(d).val())) {
         $(d).setCustomValidity('Please re-word this for an all-age audience');
         $p.showError(BANNED_WORD_MSG);
       }
@@ -658,7 +664,7 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
     validateRadio();
     if (document.getElementById(formId).checkValidity()) {
       $p.sendMessage(mep, msgName, msg, redirect, wp_callback, proxy, businessDescription);
-    } else { 
+    } else {
       $p.showFormError(formId,'Please correct highlighted fields');
     }
   };
@@ -703,8 +709,8 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
         console.log('  response: '+response);
         try { $p.response = JSON.parse(response); }
         catch (e) { $p.response = response; }
-        if ($p['onResponse'] != undefined) $p.onResponse(); 
-        if (wp_callback != undefined) wp_callback(); 
+        if ($p['onResponse'] != undefined) $p.onResponse();
+        if (wp_callback != undefined) wp_callback();
         $p.hideActivityIndicator();
         $p.showMessage('Your information has been received','bg-success text-success');
         if (undefined != redirect) window.location.href=redirect;
@@ -745,7 +751,8 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
           console.log('... '+i+':'+val+' into '+d.name);
           $(d).val(val);
         } else {
-          //console.log('... '+i+' skipping: isRadio? '+($(d).attr('type')=='radio')+', isUnchecked?'+($(d.id+':checked')));
+          console.log('... '+i+' skipping: isRadio? '+($(d).attr('type')=='radio')+', isUnchecked?'+($(d.id+':checked')));
+          //console.log('... '+$(d+':checked'));
         }
         if ($(d).data('p-type')=='number') $(d).autoNumeric('init', {mDec:0});
         if (val != undefined && $(d).data('p-type')=='number') $(d).autoNumeric('set',val);
@@ -787,10 +794,17 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
       console.log('have number');
       cmd = t.data('p-bind')+'="'+t.autoNumeric('get')+'";';
       break;
-    case (ev.target.type=='radio'):
+    case (ev.target.type=='radio' && t.data('p-bind')!=undefined):
       console.log('have radio');
+      // legacy radio controls before options synthesized?
       cmd = t.data('p-bind')+'= $(\'[data-p-bind="'+t.data('p-bind')+'"]:checked\').val();';
       break;
+    case (ev.target.type=='checkbox'):
+    case (ev.target.type=='radio'):
+      console.log('have '+ev.target.type);
+      var formObj = $(ev.target).closest('form')[0].id.replace(/-/g,'_');
+      if (eval('$p.'+formObj+'==undefined')) eval('$p.'+formObj+'={}');
+      cmd = '$p.'+formObj+'.'+ev.target.name+'="'+ev.target.value+'"';
     default:
       ; // cmd set above
     }
@@ -799,7 +813,14 @@ this.sendMessage = function(mep, msgName, msg, redirect, wp_callback, proxy, bus
     eval(cmd);
     $p.sync();
   };
-}
+  return this;
+}($));
+
+$(document).ready(function() {
+  console.info('Ready event fired, binding actions to data-p attributes...');
+  $p.init();
+});
+
 String.prototype.toLeadingCaps = function() {
   return this.substring(0,1).toUpperCase()+this.substring(1).toLowerCase();
 };
@@ -824,19 +845,5 @@ function insertAtCursor(myField, myValue) {
   }
 }
 
-function validateRadio() { 
-  $('[type="radio"]:invalid').parent().parent().find('.field-hint').removeClass('hidden').css('color','red'); 
-} 
-/**
- * @return true if the value received is valid (i.e. does not contain banned words).
- */
-function validateBannedWords(val) { 
-  var valid = true;
-  var words = val.split(/\W/); 
-  $.each(words, function(i,d) { 
-    $.each(BANNED_WORDS, function(j,e) { 
-      if (d==e) valid = false ; 
-    });
-  });
   return valid;
 }
