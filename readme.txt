@@ -102,9 +102,15 @@ The form's JSON payload may be accessed as $_REQUEST['json'].
 
 == Changelog ==
 
+= 1.0.0-a3 =
+
+- Restructure to split front end and admin scripts for smaller size
+- #24 fix bug with back button
+- #23 fix bug with radio controls causing lower controls to not bind
+
 = 1.0.0-a2 =
 
-HTTP(s) agnostic URLs
+- HTTP(s) agnostic URLs
 
 = 1.0.0-a1 =
 

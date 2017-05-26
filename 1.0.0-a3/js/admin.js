@@ -48,6 +48,7 @@ var $p = (function ($) {
         if (d==e) valid = false ;
       });
     });
+    return valid;
   }
 
   this.enhanceForms=true;
@@ -845,5 +846,3 @@ function insertAtCursor(myField, myValue) {
   }
 }
 
-  return valid;
-}

@@ -76,25 +76,26 @@
     <echo message="Compressing Javascript files in folder: ${src}/${version}/js" />
     <java jar="${yuicompressor-local-path}" fork="true">
         <!-- input path for JS files -->
-        <arg value="${src}/${version}/js/${ant.project.name}.js" />
+        <arg value="${src}/${version}/js/admin.js" />
         <!--<arg value="-v" /> --><!-- Turn on verbose -->
         <arg value="-o" />
         <!-- output path for JS files -->
-        <arg value="${src}/${version}/js/${ant.project.name}.min.js" /> 
+        <arg value="${src}/${version}/js/admin.min.js" /> 
         <classpath>
           <pathelement location="${yuicompressor-local-path}"/>
         </classpath>
     </java>
-    <!--
     <java jar="${yuicompressor-local-path}" fork="true">
-        <arg value="${src}/js/workflow-${version}.js" />
+        <!-- input path for JS files -->
+        <arg value="${src}/${version}/js/frontend.js" />
+        <!--<arg value="-v" /> --><!-- Turn on verbose -->
         <arg value="-o" />
-        <arg value="${src}/js/workflow-${version}.min.js" /> 
+        <!-- output path for JS files -->
+        <arg value="${src}/${version}/js/frontend.min.js" /> 
         <classpath>
           <pathelement location="${yuicompressor-local-path}"/>
         </classpath>
     </java>
-    -->
   </target>
 
   <target name="package" depends="compile">
