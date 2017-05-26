@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== Omny Link Forms ===
 Contributors: tstephenson
 Tags: forms, ajax, OmnyLink
 Requires at least: 4.0
@@ -86,7 +86,13 @@ When authoring the form you will see in your browser's address bar something lik
 
 = How can I access the form's content to provide custom post-processing? =
 
-The plugin is configured to send the form content to the Omny Link workflow server on submit. This provides a separation of concerns keeping the WordPress site clean and focused on presentation. However in some cases you may want to perform some limited processing in the WordPress site in response to the form submission. For this case you may register an AJAX action to be called. The form's JSON payload may be accessed as $_POST['json'].
+The plugin is intended to send the form content to the Omny Link workflow server on submit. This keeps the WordPress site clean and focused on presentation. However in some cases you may want to perform some limited processing in the WordPress site in response to the form submission. For this case you may register an AJAX action to be called.
+
+To use this callback behaviour:
+ * Write an AJAX action as described here: [here](https://codex.wordpress.org/Plugin_API/Action_Reference/wp_ajax_(action))
+ * Tell the shortcode to invoke this by specifying the callback="action" attribute.
+
+The form's JSON payload may be accessed as $_REQUEST['json'].
 
 == Screenshots ==
 
@@ -95,6 +101,16 @@ The plugin is configured to send the form content to the Omny Link workflow serv
 2. Embedding the shortcode in a page and passing the additional property 'product name'.
 
 == Changelog ==
+
+= 1.0.0-a2 =
+
+HTTP(s) agnostic URLs
+
+= 1.0.0-a1 =
+
+= 0.13.1 =
+
+= 0.13.0 =
 
 = 0.11.1 =
 Fix proxy support for sendIntermediateEvent
