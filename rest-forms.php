@@ -4,12 +4,12 @@
  * Plugin URI: http://omny.link/omny-link-forms/
  * Description: Integrates web APIs with your WordPress app.
  * Author: Copyright 2013-17 Tim Stephenson.
- * Version: 1.0.0 alpha3 
+ * Version: 1.0.0 alpha4
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '1.0.0-a3');
+  define('P_VERSION', '1.0.0-alpha4');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
@@ -42,6 +42,7 @@
         $p.server='<?php echo $p_options->get_api_url(); ?>';
         $p.tenant='<?php echo $p_options->get_message_namespace(); ?>';
         $p.proxyApi = '<?php echo $p_options->is_proxy_required() ?>'==1 ? true : false;
+        $p.proxyPath = '<?php echo $p_options->get_proxy_path() ?>';
         jQuery.ajaxSetup({xhrFields: {withCredentials: true}});
       });</script>
     <?php

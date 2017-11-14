@@ -1,5 +1,8 @@
 <?php
 
+  /**
+   * REST API to register new WordPress users.
+   */
   function p_register_async_callback() {
     require_once( plugin_dir_path( __FILE__ ).'options.php' );
     p_init_logging();
@@ -163,6 +166,9 @@
     echo $response;
 
     die(); // this is required to return a proper result
+
+    // If we had a callback do that too
+
   }
   if (P_DEBUG) error_log('Adding proxy ajax action');
   add_action( 'wp_ajax_p_proxy', 'p_proxy_callback' );
@@ -173,7 +179,7 @@
     p_init_logging();
 
     if (P_DEBUG) error_log('Call to p_domain_callback');
-    p_internal_proxy_callback('/domain/?projection=complete');
+    p_internal_proxy_callback('/domain-model/');
   } 
   if (P_DEBUG) error_log('Adding domain ajax action');
   add_action( 'wp_ajax_p_domain', 'p_domain_callback' );
@@ -198,26 +204,73 @@
 
     if ($p_options == null) $p_options = new FormsOptions();
     $url = $p_options->get_api_url().$p_options->get_message_namespace().$resource;
+    $token = p_get_jwt_token($p_options);
     if (P_DEBUG) {
       error_log('Fetch resource: ');
       error_log('  URL: '.$url);
+      error_log('  token: '.$token);
     }
 
-    // IMPLIED curl_setopt($curl_handle, CURLOPT_HTTPGET, TRUE);
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-      'Origin: '.get_site_url()
+    $response = wp_remote_get( $url, array(
+	'method' => 'GET',
+	'timeout' => 45,
+	'redirection' => 5,
+	'httpversion' => '1.0',
+	'blocking' => true,
+	'headers' => array( 
+           'Cache-Control' => 'no-cache',
+           'Content-Type' => 'application/json',
+           'Origin' => get_site_url(),
+           'X-Requested-With' => 'XMLHttpRequest',
+           'X-Authorization' => 'Bearer '.$token
+        )
     ));
-    curl_setopt($ch, CURLOPT_USERPWD, $p_options->get_api_key().":".$p_options->get_api_secret());
+    if ( is_wp_error( $response ) ) {
+      $error_message = $response->get_error_message();
+      error_log("Unable to GET: ".$error_message);
+    } else if ($response['response']['code']>=300) {
+      error_log("Unable to GET: ".$response['body']);
+    } else {
+      error_log("GET successful: ".$response['response']['code']);
+    }
 
-    $response = curl_exec($ch);
-    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    if (P_DEBUG || $http_status >=300) error_log('Response from '.$url.': '.$http_status);
-    curl_close($ch);
-    echo $response;
+    echo $response['body'];
 
     die(); // this is required to return a proper result
+  }
+
+  function p_get_jwt_token($p_options) {
+    $url = $p_options->get_api_url().'auth/login';
+    if (P_DEBUG) {
+      error_log('Attempt to login: '.$url);
+    }
+    $response = wp_remote_post( $url, array(
+	'method' => 'POST',
+	'timeout' => 45,
+	'redirection' => 5,
+	'httpversion' => '1.0',
+	'blocking' => true,
+	'headers' => array(
+          'Cache-Control' => 'no-cache',
+          'Content-Type' => 'application/json',
+          'X-Requested-With' => 'XMLHttpRequest',
+          'Origin' => get_site_url()
+        ),
+	'body' => '{ "username": "'.$p_options->get_api_key().'",'
+           .'"password": "'.$p_options->get_api_secret().'" }',
+	'cookies' => array()
+      )
+    );
+    if ( is_wp_error( $response ) ) {
+      $error_message = $response->get_error_message();
+      error_log("Unable to login: ".$error_message);
+    } else if ($response['response']['code']>=300) {
+      error_log("Unable to login: ".$response['body']);
+    } else {
+      error_log("login successful: ".$response['response']['code']);
+      if (P_DEBUG) error_log( $response['body'] );
+      return json_decode( $response['body'], true )['token'];
+    }
   }
 
   function startsWith($haystack, $needle) {
