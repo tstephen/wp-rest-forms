@@ -121,10 +121,12 @@
       // Url to update an existing process
       $url = $p_options->get_api_url().$p_options->get_message_namespace().'/messages/'.$msg_name.'/'.$_REQUEST['executionId'];
     }
+    $origin = home_url();
     if (P_DEBUG || P_INFO) {
       error_log('Notifying server: ');
       error_log('  Verb: '.$_SERVER['REQUEST_METHOD']);
       error_log('  URL: '.$url);
+      error_log('  Origin: '.$origin);
       error_log('  Message name: '.$msg_name);
       error_log('  JSON: '.$msg);
       error_log('  Execution id: '.$_REQUEST['executionId']);
@@ -136,13 +138,13 @@
       $url = $url.'?'.$msg_field.'='.urlencode($msg);
       if (P_DEBUG) error_log('  query string:'.$url);
       $ch = curl_init($url);
-      curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Origin: '.get_site_url() ));
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Origin: '.$origin ));
     } else if ($_REQUEST['executionId'] != null) {
       $ch = curl_init($url);
       curl_setopt($ch, CURLOPT_POST, true);
       curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
       curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Origin: '.get_site_url(),
+        'Origin: '.$origin,
         'Content-Type: application/json'
       ));
     } else {
@@ -153,7 +155,7 @@
         'businessDescription' => $_REQUEST['businessDescription']
       );
       curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
-      curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Origin: '.get_site_url() ));
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Origin: '.$origin ));
     }
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_USERPWD, $p_options->get_api_key().":".$p_options->get_api_secret());
@@ -220,7 +222,7 @@
 	'headers' => array( 
            'Cache-Control' => 'no-cache',
            'Content-Type' => 'application/json',
-           'Origin' => get_site_url(),
+           'Origin' => home_url(),
            'X-Requested-With' => 'XMLHttpRequest',
            'X-Authorization' => 'Bearer '.$token
         )
@@ -254,7 +256,7 @@
           'Cache-Control' => 'no-cache',
           'Content-Type' => 'application/json',
           'X-Requested-With' => 'XMLHttpRequest',
-          'Origin' => get_site_url()
+          'Origin' => home_url()
         ),
 	'body' => '{ "username": "'.$p_options->get_api_key().'",'
            .'"password": "'.$p_options->get_api_secret().'" }',

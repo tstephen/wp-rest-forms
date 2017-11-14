@@ -30,11 +30,19 @@ var $p = (function ($) {
   ENTER = 13;
   REQUIRED = '<span class="mandatory">*</span>';
   useReadyHandlers = true;
+  allowDeprecations = false;
   fadeOutMessages = true;
 
   function _escapeApostrophe(str) {
     if (str==undefined) return;
-    else return str.replace(/'/g, '\'');
+    else {
+      try {
+        return str.replace(/'/g, '\'');
+      } catch (e) {
+        console.error('problem removing diacritics from '+str+', attempt to continue');
+        return str;
+      }
+    }
   }
   function _removeDiacritics(str) {
 
@@ -126,7 +134,12 @@ var $p = (function ($) {
     ];
 
     for(var i=0; i<defaultDiacriticsRemovalMap.length; i++) {
-      str = str.replace(defaultDiacriticsRemovalMap[i].letters, defaultDiacriticsRemovalMap[i].base);
+      try {
+        str = str.replace(defaultDiacriticsRemovalMap[i].letters, defaultDiacriticsRemovalMap[i].base);
+      } catch (e) {
+        console.error('problem removing diacritics from '+str+', attempt to continue');
+        return str;
+      }
     }
 
     return str;
@@ -195,9 +208,9 @@ var $p = (function ($) {
         $p.sync();
         if (useReadyHandlers) _bindReadyHandlers();
         _bindActionHandlers();
-        _bindCombos();
+        if (allowDeprecations) _bindCombos();
         _bindControls();
-        _bindSectionsToNav();
+        if (allowDeprecations) _bindSectionsToNav();
   };
   function _bindReadyHandlers() {
         console.info('bindReadyHandlers');
