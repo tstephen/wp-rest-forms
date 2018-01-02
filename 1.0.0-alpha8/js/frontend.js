@@ -310,8 +310,9 @@ var $p = (function ($) {
           var options = $(d).data('options') == undefined ? [] : $(d).data('options').split(',');
           $.each(options, function(j,e) {
             console.log('  option: '+e);
-            ctrl += '<span class="'+d.type+'-inline"><input class="decorate" '
-            +'" onchange="validateRadio();$p.syncToModel(event)"'
+            ctrl += '<span class="'+d.type+'-inline"><input data-p-bind="$p.'
+            + $(d).closest('form')[0].id.replace(/-/g,'_')+'.'+d.id
+            +'" onchange="p.syncToModel(event)"'
             +' name="'+d.id
             +'" '+(d.required?'required ':'')+' type="'+d.type+'" value="'+e+'">'+e+'</span>'
           });

@@ -120,6 +120,10 @@ The form's JSON payload may be accessed as $_REQUEST['json'].
 
 == Changelog ==
 
+= 1.0.0.alpha8 =
+
+- #23 radio button binding fix
+
 = 1.0.0.alpha7 =
 
 - disable SSL verification since it is no longer able to verify Lets Encrypt certs
