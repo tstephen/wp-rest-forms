@@ -94,7 +94,7 @@ var $p = (function (jQuery) {
     var options = '';
     var ctrlType = document.getElementById('ctrlType').value;
     if (ctrlType == 'checkbox' || ctrlType == 'radio' || ctrlType == 'select') {
-      options = 'data-options="'+document.getEleemntById('ctrlOptions').value+'"';
+      options = 'data-options="'+document.getElementById('ctrlOptions').value+'"';
     }
     _addControl(document.getElementById('ctrlId').value,
       ctrlType,

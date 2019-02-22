@@ -3,13 +3,13 @@
  * Plugin Name: Omny Link Forms
  * Plugin URI: http://omny.link/omny-link-forms/
  * Description: Integrates web APIs with your WordPress app.
- * Author: Copyright 2013-18 Tim Stephenson.
- * Version: 1.0.0 alpha9
+ * Author: Copyright 2013-19 Tim Stephenson.
+ * Version: 1.0.0 alpha10
  * License: GPLv2 or later
  */
 
   define("P_ID", 'rest-forms');
-  define('P_VERSION', '1.0.0-alpha9');
+  define('P_VERSION', '1.0.0-alpha10');
   define("P_NAME", 'Omny Link Forms');
   define("P_TEXT_DOMAIN", 'p-textdomain');
 
