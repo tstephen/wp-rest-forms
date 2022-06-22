@@ -120,6 +120,10 @@ The form's JSON payload may be accessed as $_REQUEST['json'].
 
 == Changelog ==
 
+= 2.0.0.alpha1 =
+
+- major rewrite to support _standard_ html and post it to flowable rather than activiti
+
 = 1.0.0.alpha10 =
 
 - escape carriage returns in field values before submitting form
